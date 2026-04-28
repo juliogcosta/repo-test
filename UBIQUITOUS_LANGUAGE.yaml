@@ -1,0 +1,1015 @@
+metadata:
+  project: ycognio
+  version: 1.2.1
+  last_updated: '2026-04-17'
+  maintainer: Guardião de Linguagem Ubíqua
+  bounded_contexts:
+  - ycognio
+global_terms:
+- term: Ycognio
+  definition: Produto webchat multi-participante da Ycodify que expõe a arquitetura de agentes Claude existente nos projetos
+    Ycodify, viabilizando sessões de elicitação de requisitos colaborativas e assistidas por IA, com output em artefatos PRD
+    versionados em repositório Git.
+  synonyms: []
+  forbidden_synonyms: []
+  type: System
+  related_terms:
+  - Sessão
+  - Projeto
+  - Claude Agent SDK
+  - Artefato
+  examples:
+  - O Ycognio comprime o ciclo de elicitação de ~2 semanas para ≤4 dias corridos.
+  notes: Seção 1.1 (Vision). NÃO é chatbot genérico — é wrapper sobre arquitetura de agentes especializada. Ver Design Principle
+    Chat como Wrapper (Seção 3.1.6).
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Ycodify
+  definition: Empresa proprietária do Ycognio e da plataforma Forger. No contexto do Ycognio, é tanto cliente (encomendou
+    o produto para uso interno) quanto operadora (responsável pelo setup de repositórios Git e agentes Claude para cada projeto
+    de cliente).
+  synonyms:
+  - YC
+  forbidden_synonyms: []
+  type: Actor
+  related_terms:
+  - Ycognio
+  - Analista Ycodify
+  - Arquiteto Receptor
+  examples:
+  - A Ycodify provisiona o repositório Git pré-existente antes de iniciar sessão no Ycognio.
+  notes: Seção 1.1, 1.2, 5.2.2. A sigla YC é aceita em contexto informal.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Elicitação
+  definition: Processo estruturado de descoberta, articulação e documentação de requisitos de negócio conduzido em sessões
+    de chat assistidas pelos agentes Claude, tendo como output um PRD completo e consistente.
+  synonyms:
+  - elicitação de requisitos
+  forbidden_synonyms: []
+  type: Process
+  related_terms:
+  - Sessão
+  - PRD
+  - PO do Cliente
+  - Analista Ycodify
+  examples:
+  - O processo atual de elicitação é 100% manual, distribuído em 6-8 horas ao longo de ~2 semanas.
+  - O Ycognio comprime o ciclo de elicitação e eleva a qualidade do output.
+  notes: Seção 1.1, 2.1. Termo central do domínio. O produto inteiro serve este processo.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: PRD
+  definition: Product Requirements Document — output principal do Ycognio. Documento estruturado em 10 seções que captura
+    visão, objetivos, escopo, jornadas, requisitos funcionais e não-funcionais do sistema a ser desenvolvido. Pode conter
+    3 anexos (ANEXO A, B, C). Versionado em repositório Git compartilhado.
+  synonyms:
+  - Product Requirements Document
+  - documento de requisitos
+  forbidden_synonyms: []
+  type: Aggregate
+  related_terms:
+  - Artefato
+  - Sessão
+  - Aprovação de PRD
+  - Arquiteto Receptor
+  examples:
+  - PRD completo com 100% das 10 seções preenchidas (zero '[A PREENCHER]') em ≤8h de chat ativo.
+  - PO aprova o PRD ao final da última sessão.
+  notes: Seção 1.1, 2.2 BM-01, 3.1.5. O PRD com 10 seções é o critério de completude formal (BM-01). Inclui ANEXO_A_ProcessDetails,
+    ANEXO_B_DataModels, ANEXO_C_Integrations.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Artefato
+  definition: 'Arquivo produzido pelos agentes Claude durante uma sessão e materializado no filesystem do Projeto. Tipos:
+    PRD.md, ANEXO_A.md, ANEXO_B.md, ANEXO_C.md e seções sections/PRD_*.md. Commitado no repositório Git via bot Ycognio Bot
+    ao final de sessão ou checkpoint manual.'
+  synonyms:
+  - arquivo de sessão
+  forbidden_synonyms: []
+  type: ValueObject
+  related_terms:
+  - PRD
+  - Projeto
+  - Ycognio Bot
+  - Checkpoint
+  - GitHub API
+  examples:
+  - 'TM-02: 100% das sessões encerradas com todos os artefatos commitados e recuperáveis via git pull.'
+  notes: Seção 1.2, 1.4, Sec 10 documentos (artefato). O termo diferencia explicitamente o output do Ycognio de um mero 'resumo
+    de chat' — é um arquivo concreto e rastreável no Git.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Projeto
+  definition: 'Pasta Git pré-existente sobre a qual o Ycognio opera. Contém os agentes Claude em .claude/agents/ e recebe
+    os artefatos PRD versionados gerados durante as sessões. Ciclo de vida: ativo → concluído. Um Projeto contém N Sessões
+    e 1 PRD final aprovado.'
+  synonyms:
+  - projeto Ycognio
+  - projeto de elicitação
+  forbidden_synonyms: []
+  type: Aggregate
+  related_terms:
+  - Sessão
+  - Artefato
+  - PRD
+  - project_path
+  - Ycognio Bot
+  examples:
+  - Ao entrar na sala, participante vê painel de status do projeto com resumo da última sessão.
+  - 'A1: Repositório Git pré-existente como pré-condição do MVP.'
+  notes: Seção 1.4, 3.1.4 A1/A3, Sec 10 documentos (projeto). O Ycognio NÃO cria o repositório — opera sobre um pré-existente
+    (Assumption A1). Sinônimo 'sala' é aceito como referência informal à UI, mas o conceito de domínio é Projeto.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Sessão
+  definition: Encontro de chat dentro de um Projeto em intervalo de tempo contínuo. Possui estado próprio, gera artefatos
+    e pode ser retomada em momento posterior via resumo/status (F15). NÃO exibe mensagens anteriores ao retomar — nova sessão
+    é aberta com contexto resumido. Uma Sessão contém N Mensagens.
+  synonyms:
+  - sessão de elicitação
+  - sessão de chat
+  forbidden_synonyms: []
+  type: Aggregate
+  related_terms:
+  - Projeto
+  - Mensagem
+  - Retomada de Sessão
+  - Checkpoint
+  - Artefato
+  examples:
+  - Na primeira sessão, a IA abre com saudação + apresentação do processo.
+  - 'Sessões subsequentes (N>1): nova sessão aberta com apenas o resumo/status como contexto.'
+  notes: 'Seção 3.1.2 F15, 4.2.2, Sec 10 documentos (sessao). Modelo de retomada via summary (H-B): a IA internaliza o resumo
+    mas o chat não exibe histórico anterior.'
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Mensagem
+  definition: 'Texto enviado por um Participante no canal de chat. O roteamento para os agentes IA depende do papel do remetente
+    (F21): mensagens de PO e YC Analyst são encaminhadas ao Claude Agent SDK; mensagens de Guest são visíveis no chat para
+    outros humanos mas NÃO consumidas pela IA. Pode conter @mention para invocação direta de agente.'
+  synonyms: []
+  forbidden_synonyms: []
+  type: ValueObject
+  related_terms:
+  - Participante
+  - Roteamento de Mensagens por Papel
+  - Invocação Direta de Agente
+  - Claude Agent SDK
+  examples:
+  - 'Mensagem de PO: ''Quero construir um sistema de agendamento.'' → encaminhada à IA.'
+  - 'Mensagem de Guest: ''Concordo com esse escopo.'' → visível no chat, não encaminhada à IA.'
+  notes: Seção 3.1.2 F1/F21, Sec 10 documentos (mensagem). A regra de roteamento por papel é invariante arquitetural — não
+    pode ser sobreposta por features do chat (Design Principle 3.1.6).
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Link de Acesso
+  definition: URL única e compartilhada com TTL que serve como ponto de entrada único ao Ycognio. A mesma URL é usada por
+    todos os participantes (PO, Analista, Guests) para visualizar a lista de projetos e acessar salas. A expiração pelo TTL
+    bloqueia novas entradas.
+  synonyms:
+  - link compartilhado
+  - URL de acesso
+  forbidden_synonyms: []
+  type: ValueObject
+  related_terms:
+  - TTL
+  - Projeto
+  - Participante
+  examples:
+  - O PO recebe, por canal externo (e-mail ou link direto), a URL única compartilhada do Ycognio.
+  - 'FR-ACC-04: Link expira após TTL configurado e bloqueia novas entradas.'
+  notes: Seção 3.1.3(b), 7.3, FR-ACC-01/FR-ACC-04, Sec 10 documentos (linkacesso). Mecanismo de acesso que substitui autenticação
+    formal no MVP (F2=OUT). Rotação do link é decisão operacional da Ycodify.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: TTL
+  definition: Time-to-Live — tempo de validade configurado no Link de Acesso. Após expiração, o link bloqueia novas entradas
+    ao Ycognio. Rotação do link (geração de novo TTL) é decisão operacional.
+  synonyms:
+  - time-to-live
+  - validade do link
+  forbidden_synonyms: []
+  type: ValueObject
+  related_terms:
+  - Link de Acesso
+  examples:
+  - Link gerado com TTL de X horas; após expiração, acesso bloqueado com mensagem de link expirado.
+  notes: Seção 3.1.3(b), FR-ACC-04. NÃO confundir com timeout de sessão de chat (inatividade do participante, não gerenciado
+    no MVP).
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Formulário de Feedback
+  definition: 'Componente de coleta de avaliação qualitativa exibido ao final de sessão ou aprovação de PRD. Três variantes
+    no MVP: NPS pós-sessão do PO (F9, escala 0-10), formulário de reconhecimento do PO (F10, 2 perguntas escala 1-5) e NPS
+    do Analista Receptor (F11, escala 0-10).'
+  synonyms:
+  - form de feedback
+  - formulário NPS
+  forbidden_synonyms: []
+  type: Aggregate
+  related_terms:
+  - PO do Cliente
+  - Arquiteto Receptor
+  - Aprovação de PRD
+  examples:
+  - 'F9: ''Quão clara foi a condução da entrevista de elicitação?'' (0-10) — exibido ao PO imediatamente após aprovação do
+    PRD.'
+  - 'F11: NPS enviado ao arquiteto receptor após entrega do PRD.'
+  notes: Seção 3.1.2 F9/F10/F11, Sec 10 documentos (formulariofeedback). As três variantes são instâncias do mesmo conceito
+    mas têm respondentes e momentos distintos.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Claude Agent SDK
+  definition: SDK oficial da Anthropic usado pelo backend do Ycognio para executar os agentes Claude operacionais. Recebe
+    mensagens de PO e YC Analyst com contexto de sessão e retorna respostas em streaming. Opera com working_dir igual ao project_path
+    do Projeto.
+  synonyms:
+  - Agent SDK
+  - SDK Anthropic
+  - SDK de agentes
+  forbidden_synonyms:
+  - API do ChatGPT
+  type: System
+  related_terms:
+  - Ycognio
+  - Mensagem
+  - Roteamento de Mensagens por Papel
+  - project_path
+  examples:
+  - Backend executa os agentes Claude operacionais via SDK oficial Anthropic; passa contexto de sessão, recebe streaming de
+    respostas.
+  - 'Se SDK indisponível: mensagens de PO/YC Analyst ficam enfileiradas com indicação visual de ''aguardando agente''.'
+  notes: Seção 3.1.2 F5, Sec 10 integracoes (claudeagentsdk). Os agentes em .claude/agents/ são a fonte de comportamento —
+    o SDK é apenas o transporte. Ver Design Principle Chat como Wrapper (Seção 3.1.6).
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: GitHub API
+  definition: API REST do GitHub usada pelo Ycognio para persistência de artefatos via operações de clone, commit e push.
+    Provedor de repositório Git único no MVP (GitLab e outros estão fora do escopo). Autenticação via token do bot Ycognio
+    Bot no backend.
+  synonyms:
+  - GitHub
+  - API do GitHub
+  forbidden_synonyms: []
+  type: System
+  related_terms:
+  - Ycognio Bot
+  - Artefato
+  - Projeto
+  - Checkpoint
+  examples:
+  - 'Assumption A2: cliente (PO) e Ycodify (YC Analyst) com permissões de leitura/escrita já configuradas no repositório GitHub.'
+  notes: 'Seção 3.1.4 A2, 5.2.5, Sec 10 integracoes (githubapi). Decisão explícita: GitHub apenas no MVP. GitLab reavaliar
+    em Growth se cliente demandar.'
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Ycognio Bot
+  definition: 'Identidade de bot usada para todos os commits Git no repositório do Projeto. Email: ycognio@ycodify.com. A
+    autoria humana é rastreada via mensagem de commit, não pela identidade do committer. Exemplo: ''[PO: João] checkpoint:
+    projeto X, sessão Y — seção 3 aprovada''.'
+  synonyms:
+  - bot de commit
+  - bot Ycognio
+  forbidden_synonyms: []
+  type: Actor
+  related_terms:
+  - GitHub API
+  - Checkpoint
+  - Artefato
+  examples:
+  - Bot único 'Ycognio Bot <ycognio@ycodify.com>' com token GitHub no backend; autoria humana rastreada via mensagem de commit.
+  notes: Seção 3.1.3(c), Sec 10 eventos (ArtefatoCommitado). No MVP não há autenticação por participante individual — toda
+    escrita no Git passa por este bot único.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: project_path
+  definition: Parâmetro de caminho absoluto para a pasta Git pré-existente do Projeto, informado pelo operador na abertura
+    de cada sessão. O Ycognio usa este valor como working_dir ao invocar o Claude Agent SDK, determinando sobre qual repositório
+    os agentes vão ler e escrever artefatos.
+  synonyms:
+  - working_dir
+  - caminho do projeto
+  forbidden_synonyms: []
+  type: ValueObject
+  related_terms:
+  - Projeto
+  - Claude Agent SDK
+  - Sessão
+  examples:
+  - 'A3: project_path como input de sessão — parâmetro informado na abertura; Ycognio usa working_dir = project_path via Agent
+    SDK.'
+  notes: Seção 3.1.4 A3, 3.1.2 F5. Pré-condição obrigatória de toda sessão. O Ycognio NÃO provisiona o repositório apontado
+    — apenas opera sobre ele.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Chat como Wrapper
+  definition: 'Princípio arquitetural fundamental do Ycognio (Design Principle 3.1.6): o webchat é uma interface que expõe
+    a arquitetura de agentes existente em .claude/agents/, sem ter agência sobre os agentes. Toda lógica de comportamento
+    dos agentes reside nos prompts — não no código do webchat.'
+  synonyms:
+  - Design Principle 3.1.6
+  - chat como interface
+  forbidden_synonyms:
+  - controlador de agentes
+  type: Concept
+  related_terms:
+  - Claude Agent SDK
+  - Ycognio
+  - Roteamento de Mensagens por Papel
+  examples:
+  - O chat NÃO pode reescrever o comportamento dos agentes, substituir lógica de elicitação ou injetar inteligência paralela
+    à dos agentes.
+  - 'Guardrail: qualquer feature proposta que viole este princípio deve ser rejeitada ou reformulada.'
+  notes: Seção 3.1.6. Este princípio é guardrail de escopo para PMs e desenvolvedores. Melhorias em .claude/agents/ refletem
+    automaticamente no produto sem exigir deploy de feature no chat.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Roteamento de Mensagens por Papel
+  definition: 'Regra arquitetural (F21) que determina quais mensagens são encaminhadas aos agentes IA: mensagens de participantes
+    com papel PO ou YC Analyst são consumidas pelo Claude Agent SDK; mensagens de participantes com papel Guest ficam visíveis
+    no webchat para humanos mas NÃO são consumidas pela IA.'
+  synonyms:
+  - F21
+  - segregação de mensagens por papel
+  forbidden_synonyms: []
+  type: Concept
+  related_terms:
+  - Mensagem
+  - Chat como Wrapper
+  - PO do Cliente
+  - Analista Ycodify
+  - Guest
+  examples:
+  - 'FR-CHT-02: Mensagens de PO e YC Analyst → encaminhadas ao pipeline de agentes.'
+  - 'FR-CHT-03: Mensagens de Guest → visíveis no chat, ausência de evento ai_request_sent nos logs.'
+  notes: Seção 3.1.2 F21, 3.1.6, FR-CHT-02/03. Regra de segregação arquitetural — não é feature opcional; é invariante do
+    sistema.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Checkpoint
+  definition: Ação disponível para YC Analyst que solicita consolidação e commit imediato dos artefatos gerados até o momento
+    no repositório Git, sem encerrar a sessão. Permite persistência incremental do trabalho sem esperar o encerramento formal.
+  synonyms:
+  - checkpoint manual
+  - salvar sessão
+  forbidden_synonyms: []
+  type: Command
+  related_terms:
+  - Sessão
+  - Artefato
+  - Ycognio Bot
+  - GitHub API
+  examples:
+  - PO ou YC Analyst podem invocar @orquestrador-pm para realizar checkpoint do trabalho a qualquer momento.
+  - 'FR-PER-01: ao final de sessão/checkpoint, artefatos são commitados no repositório Git via bot Ycognio Bot.'
+  notes: Seção 4.2.4, FR-PER-01, Sec 10 comandos (SolicitarCheckpoint). Diferente de 'Encerrar Sessão' — o checkpoint preserva
+    a sessão ativa.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Retomada de Sessão
+  definition: 'Feature (F15) que permite a um participante retornar a um Projeto e continuar o trabalho de elicitação a partir
+    do ponto onde parou. Implementada via resumo/status da sessão anterior como contexto (padrão H-B): nova sessão de chat
+    é aberta tendo apenas o resumo como contexto — o histórico de mensagens anteriores NÃO é exibido.'
+  synonyms:
+  - retomar sessão
+  - F15
+  - H-B resumption
+  forbidden_synonyms: []
+  type: Process
+  related_terms:
+  - Sessão
+  - Projeto
+  - Painel de Status do Projeto
+  examples:
+  - Participante clica 'Retomar última sessão' na sala do projeto → nova sessão aberta com resumo/status como contexto.
+  - 'FR-PER-04: ''O PRD reflete o que você queria construir?'' — sistema apresenta resumo do status da última sessão.'
+  notes: 'Seção 3.1.2 F15, 4.2.2, FR-PER-04. O modelo H-B (summary-based resumption) é deliberado: preserva contexto sem sobrecarregar
+    a janela de contexto do LLM com histórico completo.'
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Aprovação de PRD
+  definition: Ato formal pelo qual o PO do Cliente valida que o PRD produzido reflete fielmente o negócio que deseja construir.
+    Disparado pelo comando AprovarPRD (F10). Ao approvar, o sistema exibe o Formulário de Feedback de reconhecimento (2 perguntas
+    escala 1-5) e NPS de clareza (escala 0-10). Gera o evento de domínio PRDAprovado.
+  synonyms:
+  - aprovação do PRD
+  - validação final do PRD
+  forbidden_synonyms: []
+  type: Process
+  related_terms:
+  - PRD
+  - PO do Cliente
+  - Formulário de Feedback
+  - Arquiteto Receptor
+  examples:
+  - 'Na última sessão do projeto: apresentação do PRD final ao PO para aprovação formal → formulário NPS pós-sessão (F9) →
+    form reconhecimento (F10).'
+  notes: Seção 4.2.4, FR-FBK-01/02, Sec 10 eventos (PRDAprovado). A aprovação é o gatilho para medir UM-01 e UM-02 (NPS e
+    reconhecimento).
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Invocação Direta de Agente
+  definition: Mecanismo (F4) pelo qual participantes com papel PO ou YC Analyst dirigem uma mensagem a um agente específico
+    usando a sintaxe @nome-do-agente. O sistema roteia a invocação ao agente correto conforme .claude/agents/ do Projeto.
+  synonyms:
+  - '@mention'
+  - invocação via @
+  - F4
+  forbidden_synonyms: []
+  type: Command
+  related_terms:
+  - Mensagem
+  - Claude Agent SDK
+  - Roteamento de Mensagens por Papel
+  examples:
+  - '@guardiao valida esse termo.'
+  - '@analista-de-negocio detalhe isso.'
+  - 'FR-CHT-04: Participante envia ''@sofia Qual o próximo passo?'' → agente ''sofia'' responde com label identificador.'
+  notes: Seção 3.1.2 F4, FR-CHT-04. Exclusivo para PO e YC Analyst — Guest não pode invocar agentes diretamente (F21). A sintaxe
+    @nome-do-agente é canônica.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Telemetria
+  definition: Sistema de instrumentação de eventos do Ycognio que registra user_typing_start, user_message_sent e ai_response_complete
+    por sessão e por participante. Usado para calcular o tempo de chat ativo cumulativo (métrica BM-01) e latência de broadcast
+    (métrica TM-03).
+  synonyms:
+  - instrumentação de eventos
+  - event tracking
+  forbidden_synonyms: []
+  type: System
+  related_terms:
+  - Sessão
+  - Mensagem
+  - Claude Agent SDK
+  examples:
+  - 'F8: instrumentação de eventos user_typing_start, user_message_sent, ai_response_complete.'
+  - 'BM-01: tempo de chat ativo cumulativo calculado via telemetria.'
+  notes: Seção 3.1.2 F8, FR-TEL-02. Os três eventos são canônicos — não devem ser renomeados em implementação sem atualizar
+    o glossário.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Painel de Status do Projeto
+  definition: 'Componente da UI do Ycognio (F18) exibido ao entrar na sala de um Projeto. Mostra: resumo da última sessão
+    (data/hora início-fim, principais pontos), tempo decorrido desde a primeira sessão até a atual (esforço de elicitação
+    acumulado).'
+  synonyms:
+  - painel de status
+  - F18
+  forbidden_synonyms: []
+  type: Concept
+  related_terms:
+  - Projeto
+  - Sessão
+  - Retomada de Sessão
+  examples:
+  - 'FR-VIS-03: ao entrar na sala, participante vê painel de status com resumo da última sessão e tempo decorrido.'
+  - 'FR-VIS-05: campo ''tempo acumulado'' exibe soma do tempo de chat ativo de todas as sessões.'
+  notes: Seção 3.1.2 F18, FR-VIS-03/05. Presente em todas as jornadas (A.1, A.2, B.1, C.1) ao entrar na sala. NÃO confundir
+    com Painel do PRD em Construção (F14), que exibe o conteúdo do documento.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Painel do PRD em Construção
+  definition: Componente da UI do Ycognio (F14) acessado sob demanda pelo participante — área separada do canal de mensagens
+    (painel lateral ou aba dedicada) que exibe o PRD.md em construção em seu estado atual. Permite validação incremental do
+    conteúdo sem poluir o chat.
+  synonyms:
+  - painel do PRD
+  - F14
+  - painel de visualização do PRD
+  forbidden_synonyms: []
+  type: Concept
+  related_terms:
+  - PRD
+  - Sessão
+  - Painel de Status do Projeto
+  - Aprovação de PRD
+  examples:
+  - 'FR-VIS-02: painel dedicado separado do chat exibe conteúdo atual do PRD em construção.'
+  - Disponível nas jornadas A.1, A.2, B.1 sob demanda do participante.
+  notes: Seção 3.1.2 F14, FR-VIS-02. NÃO confundir com Painel de Status do Projeto (F18). O F14 mostra o CONTEÚDO do PRD;
+    o F18 mostra o STATUS da sessão.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Baseline
+  definition: 'Medida do processo manual de elicitação atualmente praticado pela Ycodify, antes do Ycognio. Tempo total estimado:
+    6-8 horas de esforço distribuídas em ~2 semanas de calendário. Serve como referência para medir o valor entregue pelo
+    MVP.'
+  synonyms:
+  - processo manual atual
+  - baseline do processo
+  forbidden_synonyms: []
+  type: Concept
+  related_terms:
+  - Elicitação
+  - Sessão
+  - MVP
+  examples:
+  - 'Seção 2.5: Baseline (processo manual atual) × Meta MVP (Ycognio).'
+  - 'Processo baseline: 6-8h estimado, inclui idas e vindas; distribuição: ~2 semanas.'
+  notes: Seção 2.5, 3.1.5. O Baseline é o objeto de comparação das métricas BM-01 e BM-02.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: MVP
+  definition: 'Minimum Viable Product — primeira fase de entrega do Ycognio. Foco na validação da hipótese central: processo
+    assistido por IA produz PRDs completos, consistentes e em menos dias corridos do que o processo manual. Contempla 18 features
+    (F1, F3-F15, F17-F19, F21). Meta: 10 PRDs/mês, 2 sessões simultâneas.'
+  synonyms:
+  - Fase MVP
+  - Minimum Viable Product
+  forbidden_synonyms:
+  - PoC
+  - prova de conceito
+  type: Concept
+  related_terms:
+  - Growth Phase
+  - Vision Phase
+  - Baseline
+  examples:
+  - O MVP deliberadamente evita fricções de onboarding (autenticação formal, provisionamento de infra) para permitir validação
+    rápida.
+  notes: 'Seção 3.1, 3.1.5. Critério de validação: 3 meses em produção OU 30 PRDs concluídos (o que vier primeiro) com metas
+    de BM-01 a TM-03 atingidas em ≥80% das sessões.'
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Growth Phase
+  definition: 'Segunda fase de entrega do Ycognio (3 a 6 meses pós-MVP). Objetivo: consolidar o produto com controles de escala
+    — autenticação formal (G1), integração Forger (G2), instrumentação de retrabalho (G3), dashboards (G4). Gatilho: metas
+    da Seção 3.1.5 atingidas.'
+  synonyms:
+  - Fase Growth
+  - Growth
+  - Fase 2
+  forbidden_synonyms: []
+  type: Concept
+  related_terms:
+  - MVP
+  - Vision Phase
+  examples:
+  - F2 (autenticação formal) será reativado como G1 na Growth Phase.
+  notes: Seção 3.2. NÃO é backlog comprometido — é fase condicionada à validação do MVP.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Vision Phase
+  definition: 'Terceira fase de entrega do Ycognio (1 a 3+ anos pós-MVP). Objetivo: posicionar o Ycognio como plataforma central
+    de engenharia de produto da Ycodify, com capacidades multimodais (V5), marketplace de templates (V4), integração end-to-end
+    com pipeline de implementação (V3). Não é backlog comprometido.'
+  synonyms:
+  - Fase Vision
+  - Vision
+  - Fase 3
+  forbidden_synonyms: []
+  type: Concept
+  related_terms:
+  - MVP
+  - Growth Phase
+  examples:
+  - 'V1: Agentes de abertura de chamados de mudança em especificações existentes.'
+  notes: Seção 3.3. Reavaliação formal a cada 6 meses, condicionada a resultados de MVP e Growth.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Self-service
+  definition: Modalidade de uso do Ycognio em que o PO do Cliente conduz a sessão de elicitação sem a presença de um Analista
+    Ycodify — apenas PO e agentes IA na sala. Jornada A.1. Demanda maior confiança nos agentes Claude para desambiguação.
+  synonyms:
+  - modalidade self-service
+  - A.1
+  forbidden_synonyms: []
+  type: Concept
+  related_terms:
+  - PO do Cliente
+  - Sessão
+  - Analista Ycodify
+  examples:
+  - 'Jornada A.1: apenas PO + agentes IA na sala — nenhum YC Analyst presente.'
+  - 'Pain adicional na A.1: solidão cognitiva — sem mediação humana ao travar em termo técnico.'
+  notes: Seção 1.5, 4.3. Contraste com modalidade assistida (Jornada A.2, presença de YC Analyst). A Ycodify oferece ambas
+    as modalidades.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: PO do Cliente
+  definition: Product Owner ou equivalente da empresa cliente. Interlocutor principal da IA nas sessões. Papel `po` no login
+    (dropdown). Seleciona papel PO ao entrar na sala. Linguagem de negócio pura — não precisa conhecer jargão técnico. Aprova
+    o PRD ao final.
+  synonyms:
+  - PO
+  - Product Owner
+  - Persona A
+  forbidden_synonyms: []
+  type: Actor
+  related_terms:
+  - Sessão
+  - Aprovação de PRD
+  - Formulário de Feedback
+  - Analista Ycodify
+  - Guest
+  examples:
+  - O PO responde perguntas de elicitação, valida escopo e aprova artefatos.
+  - 'FR-ACC-03: participante informa nick + seleciona papel PO no dropdown.'
+  notes: 'Seção 1.3.1, Sec 10 papeis (po). Persona A. Perfis típicos: Product Owners, Gerentes de TI, Diretores com ownership
+    do produto. A IA adapta primariamente seu registro de comunicação para este ator.'
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Analista Ycodify
+  definition: 'Analista de Domínio e Processos da Ycodify. Interlocutor secundário da IA. Papel `ycanalyst` no login (dropdown).
+    Opera em 3 modos na sessão: facilitador (reformula perguntas da IA), especialista técnico (provê profundidade técnica),
+    invocador de agentes (aciona agentes por demanda). Pode solicitar checkpoint e encerrar sessão.'
+  synonyms:
+  - YC Analyst
+  - Persona B
+  - Analista Ycodify
+  - analista
+  forbidden_synonyms: []
+  type: Actor
+  related_terms:
+  - PO do Cliente
+  - Sessão
+  - Checkpoint
+  - Invocação Direta de Agente
+  - Arquiteto Receptor
+  examples:
+  - YC Analyst atua como facilitador, especialista técnico ou invocador de agentes conforme necessidade da sessão.
+  - 'B.1: Analyst pode invocar agentes específicos via @nome-do-agente sempre que útil.'
+  notes: Seção 1.3.2, Sec 10 papeis (ycanalyst). Persona B. Perfil técnico completo — codificação, análise de sistemas, modelagem
+    de domínio. NÃO confundir com Arquiteto Receptor (que consome o PRD downstream, não participa da sessão).
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Guest
+  definition: Observador convidado pelo PO ou pelo YC Analyst para acompanhar uma sessão. Papel `guest` no login (dropdown).
+    Participação majoritariamente passiva — pode digitar no chat (visível para humanos) mas suas mensagens NÃO são consumidas
+    pela IA (F21). Saída da sala não gera eventos especiais.
+  synonyms:
+  - observador
+  - Persona C
+  forbidden_synonyms: []
+  type: Actor
+  related_terms:
+  - PO do Cliente
+  - Analista Ycodify
+  - Roteamento de Mensagens por Papel
+  - Sessão
+  examples:
+  - 'Jornada C.1: Guest pode digitar no webchat mas suas mensagens NÃO são consumidas pela IA.'
+  - Entradas e saídas de Guests são transparentes para a IA — não geram eventos especiais no fluxo.
+  notes: 'Seção 1.3.3, Sec 10 papeis (guest). Persona C. Permissões Git: apenas leitura. A ''exceção explícita'' (PO sempre
+    interage ativamente) está na Seção 1.3.3 e não altera esta definição.'
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Arquiteto Receptor
+  definition: Arquiteto ou analista da Ycodify que recebe e consome o PRD aprovado como ponto de partida para gerar especificações
+    técnicas (spec_documentos.json, spec_processos.json, spec_integracoes.json). NÃO participa da sessão de elicitação — é
+    consumidor downstream do artefato.
+  synonyms:
+  - analista receptor
+  - arquiteto Ycodify
+  forbidden_synonyms: []
+  type: Actor
+  related_terms:
+  - PRD
+  - Aprovação de PRD
+  - Formulário de Feedback
+  - Analista Ycodify
+  examples:
+  - 'BM-04: NPS do analista receptor — ''Quão provável você recomendaria este PRD como ponto de partida para desenvolvimento?''
+    (F11).'
+  notes: Seção 2.2 BM-04, FR-FBK-03. NÃO confundir com Analista Ycodify (que conduz a sessão). O Arquiteto Receptor é o cliente
+    interno do PRD após a aprovação.
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Controlador
+  definition: 'No contexto da LGPD: entidade que determina as finalidades e os meios do tratamento de dados pessoais. No Ycognio,
+    o papel de Controlador recai sobre a empresa cliente da Ycodify (é o negócio do cliente que está sendo especificado nas
+    conversas).'
+  synonyms:
+  - data controller
+  forbidden_synonyms:
+  - responsável pelos dados
+  type: Concept
+  related_terms:
+  - Sub-operador
+  - Ycodify
+  examples:
+  - O conteúdo das conversas durante sessões pertence ao Cliente da Ycodify — que atua como Controlador dos dados de negócio.
+  notes: Seção 5.2.2, 5.2.3. LGPD formal está FORA do escopo do MVP (Seção 5.1). Registrado para uso correto da terminologia
+    legal em contratos e NDA. Não confundir Controlador com Operador (Ycodify) nem com Sub-operador (Anthropic, GitHub).
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+- term: Sub-operador
+  definition: 'No contexto da LGPD: fornecedor de infraestrutura que processa dados em nome do Operador (Ycodify) sem relação
+    direta com o Controlador (cliente). No Ycognio, Sub-operadores são Anthropic (Claude API) e GitHub (repositório), cobertos
+    por seus próprios termos contratuais.'
+  synonyms:
+  - sub-processor
+  - fornecedor de infraestrutura
+  forbidden_synonyms: []
+  type: Concept
+  related_terms:
+  - Controlador
+  - Ycodify
+  - Claude Agent SDK
+  - GitHub API
+  examples:
+  - Anthropic e GitHub cobertos por seus próprios termos contratuais como Sub-operadores.
+  notes: Seção 5.2.3. LGPD formal está FORA do escopo do MVP. Registrado para uso correto em NDA padrão único (Seção 5.2.3).
+  added_date: '2026-04-17'
+  added_by: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+bounded_context_terms:
+  ycognio:
+  - term: Participante
+    definition: Humano identificado na sala de um Projeto pelo nick livre informado no login e pelo papel selecionado no dropdown
+      (PO, YC Analyst ou Guest). Sem cadastro formal no MVP. O papel define o roteamento de mensagens (F21) e as permissões
+      Git.
+    scope: BC ycognio. Conceito de sessão — não persiste entre sessões (nick pode mudar).
+    aggregate: false
+    value_object: false
+    entity: true
+    domain_event: false
+    invariants:
+    - 'Papel deve ser exatamente um de: PO, YC Analyst, Guest — lista fechada, sem digitação livre.'
+    - Nick é livre mas obrigatório para entrar na sala.
+    commands:
+    - command: Entrar na Sala
+      event_result: Participante Entrou na Sala
+    examples:
+    - 'FR-ACC-03: participante informa nick ''Ana'' + seleciona papel ''PO'' no dropdown.'
+    notes: Seção 3.1.3(a), Sec 10 documentos (participante). No MVP não há autenticação formal — a identidade é declarada
+      pelo próprio participante.
+context_mappings: []
+business_to_technical_map:
+  modulos:
+  - business_term: Ycognio
+    technical_id: ycognio
+    bounded_context: true
+  documentos:
+  - business_term: Projeto
+    technical_id: projeto
+    aggregate: true
+    modulo: ycognio
+  - business_term: Sessão
+    technical_id: sessao
+    aggregate: true
+    modulo: ycognio
+  - business_term: Participante
+    technical_id: participante
+    aggregate: false
+    modulo: ycognio
+  - business_term: Mensagem
+    technical_id: mensagem
+    aggregate: false
+    modulo: ycognio
+  - business_term: Artefato
+    technical_id: artefato
+    aggregate: false
+    modulo: ycognio
+  - business_term: Link de Acesso
+    technical_id: linkacesso
+    aggregate: false
+    modulo: ycognio
+  - business_term: Formulário de Feedback
+    technical_id: formulariofeedback
+    aggregate: false
+    modulo: ycognio
+  processos:
+  - business_term: Acesso ao Ycognio
+    technical_id: acessoycognio
+    modulo: ycognio
+  - business_term: Entrada na Sala
+    technical_id: entradasala
+    modulo: ycognio
+  - business_term: Conversação no Chat
+    technical_id: conversacaochat
+    modulo: ycognio
+  - business_term: Retomada de Sessão
+    technical_id: retomadasessao
+    modulo: ycognio
+  - business_term: Checkpoint e Encerramento
+    technical_id: checkpointencerramento
+    modulo: ycognio
+  - business_term: Aprovação de PRD e Feedback
+    technical_id: aprovacaoprd
+    modulo: ycognio
+  comandos:
+  - business_term: Entrar na Sala
+    technical_id: EntrarNaSala
+    documento: participante
+  - business_term: Enviar Mensagem
+    technical_id: EnviarMensagem
+    documento: mensagem
+  - business_term: Invocar Agente
+    technical_id: InvocarAgente
+    documento: mensagem
+  - business_term: Solicitar Checkpoint
+    technical_id: SolicitarCheckpoint
+    documento: sessao
+  - business_term: Encerrar Sessão
+    technical_id: EncerrarSessao
+    documento: sessao
+  - business_term: Retomar Última Sessão
+    technical_id: RetomarUltimaSessao
+    documento: sessao
+  - business_term: Aprovar PRD
+    technical_id: AprovarPRD
+    documento: projeto
+  - business_term: Responder Feedback
+    technical_id: ResponderFeedback
+    documento: formulariofeedback
+  eventos:
+  - business_term: Sessão Iniciada
+    technical_id: SessaoIniciada
+    documento: sessao
+  - business_term: Participante Entrou na Sala
+    technical_id: ParticipanteEntrouNaSala
+    documento: participante
+  - business_term: Mensagem Enviada
+    technical_id: MensagemEnviada
+    documento: mensagem
+  - business_term: Mensagem Encaminhada aos Agentes
+    technical_id: MensagemEncaminhadaAgentes
+    documento: mensagem
+  - business_term: Resposta de Agente Completa
+    technical_id: RespostaAgenteCompleta
+    documento: mensagem
+  - business_term: Checkpoint Solicitado
+    technical_id: CheckpointSolicitado
+    documento: sessao
+  - business_term: Sessão Encerrada
+    technical_id: SessaoEncerrada
+    documento: sessao
+  - business_term: Artefato Commitado
+    technical_id: ArtefatoCommitado
+    documento: artefato
+  - business_term: Link Expirado
+    technical_id: LinkExpirado
+    documento: linkacesso
+  - business_term: PRD Aprovado
+    technical_id: PRDAprovado
+    documento: projeto
+  - business_term: Feedback Respondido
+    technical_id: FeedbackRespondido
+    documento: formulariofeedback
+  papeis:
+  - business_term: PO do Cliente
+    technical_id: po
+    modulo: ycognio
+  - business_term: Analista Ycodify
+    technical_id: ycanalyst
+    modulo: ycognio
+  - business_term: Guest (Observador)
+    technical_id: guest
+    modulo: ycognio
+  integracoes:
+  - business_term: Claude Agent SDK (Anthropic)
+    technical_id: claudeagentsdk
+    tipo: SDK
+  - business_term: GitHub API
+    technical_id: githubapi
+    tipo: REST_API
+ambiguous_terms: []
+semantic_drift_log: []
+forbidden_patterns:
+- pattern: Usar 'sala' como sinônimo de 'Projeto'
+  reason: Sala é referência informal à UI (room do chat). Projeto é o conceito de domínio — pasta Git com agentes e artefatos.
+    Confundir os dois dilui a fronteira entre UI e domínio.
+  replacement: Usar 'sala do projeto' se referindo ao componente UI; usar 'Projeto' ao falar do conceito de domínio.
+  examples:
+  - wrong: A sala tem 3 sessões registradas.
+    correct: O Projeto tem 3 sessões registradas.
+  - wrong: Entrei na sala para ver os artefatos.
+    correct: Entrei na sala do Projeto para ver os artefatos (Projeto contém os artefatos no repositório Git).
+- pattern: Usar 'chatbot' ou 'assistente' para descrever o Ycognio
+  reason: O Ycognio não é um chatbot genérico — é um wrapper sobre arquitetura de agentes especializada (Design Principle
+    3.1.6). 'Chatbot' implica comportamento genérico e dilui o diferencial do produto.
+  replacement: Usar 'Ycognio', 'webchat de elicitação assistida' ou 'interface de agentes'.
+  examples:
+  - wrong: O chatbot fez perguntas sobre o escopo.
+    correct: O Orquestrador (agente Claude) fez perguntas sobre o escopo no Ycognio.
+- pattern: Usar 'conversa', 'thread' ou 'ticket' no lugar de 'Sessão'
+  reason: 'Sessão tem semântica de domínio específica: tem ciclo de vida, gera artefatos, pode ser retomada via H-B e é unidade
+    de telemetria. Termos genéricos perdem essas propriedades.'
+  replacement: Usar 'Sessão' (conceito de domínio) ou 'sessão de chat' (informal).
+  examples:
+  - wrong: Abri uma conversa nova para continuar o trabalho.
+    correct: Iniciei uma nova Sessão com retomada do contexto da sessão anterior.
+- pattern: Usar 'oferta', 'escopo', 'briefing' no lugar de 'PRD'
+  reason: PRD é o termo técnico do output — tem estrutura definida (10 seções), critério de completude formal e ciclo de aprovação.
+    Termos vagos impedem rastreabilidade com métricas BM-01/BM-03.
+  replacement: Usar 'PRD' (formal) ou 'documento de requisitos' (muito informal, evitar).
+  examples:
+  - wrong: Vou enviar o escopo para o arquiteto.
+    correct: Vou compartilhar o PRD aprovado com o Arquiteto Receptor.
+validation_rules:
+- rule_id: VR-001
+  rule_name: Termo deve estar no glossário
+  severity: warning
+  description: Todo termo de domínio usado em conversas e documentos deve existir no glossário.
+  action_on_violation: 'Alertar e solicitar definição se novo termo (validation_mode: permissive).'
+- rule_id: VR-002
+  rule_name: Forbidden synonyms não podem ser usados
+  severity: error
+  description: Termos em forbidden_synonyms de qualquer entrada do glossário geram alerta e sugestão do termo correto.
+  action_on_violation: Alertar com termo correto (permissive mode).
+- rule_id: VR-003
+  rule_name: Design Principle 3.1.6 não pode ser violado em features
+  severity: error
+  description: Nenhuma feature do chat pode ter agência sobre os agentes Claude (controlar, reescrever, filtrar comportamento
+    dos agentes).
+  action_on_violation: Bloquear feature e solicitar reformulação.
+- rule_id: VR-004
+  rule_name: Papéis de Participante são lista fechada
+  severity: error
+  description: 'Papel de Participante deve ser exatamente um de: PO, YC Analyst, Guest. Qualquer outro papel é inválido.'
+  action_on_violation: Rejeitar e corrigir para um dos três papéis válidos.
+- rule_id: VR-005
+  rule_name: Termos ambíguos devem ser esclarecidos
+  severity: warning
+  description: Se termo está em ambiguous_terms, solicitar esclarecimento de contexto.
+  action_on_violation: Pausar e solicitar decisão de resolução.
+changelog:
+- version: '1.0'
+  date: '2026-04-17'
+  author: Inicialização automática
+  changes: Arquivo criado a partir do template (conteúdo genérico — não representava o domínio Ycognio).
+  terms_added: []
+  terms_modified: []
+  terms_removed: []
+- version: '1.1'
+  date: '2026-04-17'
+  author: Guardião de Linguagem Ubíqua (auditoria pós-PRD 10/10)
+  changes: 'Substituição completa do conteúdo de exemplo (domínio licitações) por termos reais do Ycognio. 36 termos extraídos
+    das 10 seções do PRD com rastreabilidade a cada seção de origem. Bounded contexts atualizados: [bc1]/[bc2]/[bc3] substituído
+    por [''ycognio''] (único BC). business_to_technical_map populado em sincronia com PRD Seção 10. forbidden_patterns criados
+    para os 4 padrões de drift mais prováveis no domínio.
+
+    '
+  terms_added:
+  - Ycognio
+  - Ycodify
+  - Elicitação
+  - PRD
+  - Artefato
+  - Projeto
+  - Sessão
+  - Mensagem
+  - Link de Acesso
+  - TTL
+  - Formulário de Feedback
+  - Claude Agent SDK
+  - GitHub API
+  - Ycognio Bot
+  - project_path
+  - Chat como Wrapper
+  - Roteamento de Mensagens por Papel
+  - Checkpoint
+  - Retomada de Sessão
+  - Aprovação de PRD
+  - Invocação Direta de Agente
+  - Telemetria
+  - Painel de Status do Projeto
+  - Painel do PRD em Construção
+  - Baseline
+  - MVP
+  - Growth Phase
+  - Vision Phase
+  - Self-service
+  - PO do Cliente
+  - Analista Ycodify
+  - Guest
+  - Arquiteto Receptor
+  - Participante
+  - Controlador
+  - Sub-operador
+  terms_modified: []
+  terms_removed:
+  - Licitante (exemplo genérico)
+  - Licitacao (exemplo genérico)
+  - Validacao (exemplo genérico)
+- version: '1.2'
+  date: '2026-04-17'
+  author: Orquestrador (limpeza pós-validação)
+  changes:
+  - 'Limpeza de forbidden_synonyms: removidas entradas que eram conceitos distintos (não sinônimos reais)'
+  - 'Mantidos apenas 5 termos com forbidden_synonyms legítimos (real risco de confusão semântica):'
+  - '  - Claude Agent SDK → [API do ChatGPT] (Anthropic vs OpenAI)'
+  - '  - Chat como Wrapper → [controlador de agentes] (oposto semântico — Design Principle 3.1.6)'
+  - '  - Painel de Status do Projeto → [dashboard] (Dashboard é feature G4 Growth, distinta)'
+  - '  - MVP → [PoC, prova de conceito] (etapas distintas de produto)'
+  - '  - Controlador → [responsável pelos dados] (termo legal LGPD vs genérico)'
+  - Removidas 29 listas de forbidden_synonyms que eram categoria-erro (termos distintos, não sinônimos).
+  - 'Motivação: validação /ubiquitous-language-validation detectou 137 false positives porque campo estava incorretamente
+    populado.'
+- version: 1.2.1
+  date: '2026-04-17'
+  author: Orquestrador (ajuste pós-revalidação)
+  changes:
+  - Removido "dashboard" de forbidden_synonyms de "Painel de Status do Projeto".
+  - 'Motivação: "Dashboard" é o nome canônico de G4 (Growth Phase) em PRD_03 — não é confusão com Painel de Status (MVP),
+    são features distintas de fases distintas.'
+statistics:
+  total_global_terms: 35
+  total_bc_terms: 1
+  total_ambiguous_terms: 0
+  total_drift_incidents: 0
+  conformity_rate: 1.0
+  last_drift_check: '2026-04-17T00:00:00'
+  most_violated_rule: null
