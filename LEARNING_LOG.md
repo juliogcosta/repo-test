@@ -1,188 +1,171 @@
 ---
-version: "1.0"
-last_updated: "2026-04-30T18:24:12Z"
-total_entries: 0
+version: "1.1"
+last_updated: "2026-04-30"
+total_entries: 8
 ---
 
-# Learning Log — Lições Aprendidas (Global)
+# Learning Log — Pendencias e Licoes (Projeto CRM)
 
-**Propósito**: Este arquivo acumula lições aprendidas de **TODOS os projetos** da plataforma YC para melhorar elicitação de requisitos continuamente.
-
-**Como funciona**:
-1. **Detecção automática**: Quando um Arquiteto (Documentos, Processos, Integrações) bloqueia aguardando informação adicional do cliente, o Orquestrador detecta o **gap informacional**
-2. **Registro**: Orquestrador oferece registrar a lição com contexto (o que faltou, em qual seção do PRD)
-3. **Frequência**: Se mesma lição ocorre ≥3 vezes em projetos diferentes, sistema recomenda promover para **questionário padrão do Analista**
-4. **Melhoria contínua**: Com o tempo, elicitação se torna mais completa e Arquitetos bloqueiam menos
+**Propósito**: Registrar lacunas informacionais detectadas durante a elicitacao da passagem 1, para tratamento em ciclos futuros (VE ou proximas passagens).
 
 ---
 
 ## Entradas
 
-<!-- As entradas serão adicionadas dinamicamente conforme lições são aprendidas -->
-
-<!-- Exemplo de estrutura de entrada:
-
 ### Entry 001
 ```yaml
 id: "001"
-date_first_occurred: "2026-04-10"
-date_last_occurred: "2026-04-15"
-frequency: 3
-context: "Arquiteto de Documentos bloqueou aguardando regras de validação"
-missing_info_type: "Regras de validação de campos (formato, range, obrigatoriedade)"
-section_affected: "PRD Seção 10 (Metadados YAML) + ANEXO B (Data Models)"
+date_first_occurred: "2026-04-30"
+date_last_occurred: "2026-04-30"
+frequency: 1
+context: "Elicitacao passagem 1 — Bloco 2 (Jornada do Lead)"
+missing_info_type: "Regra de atribuicao de Lead vindo de formulario web (automatica vs fila para Gerente)"
+section_affected: "ANEXO A — P-01 (RN-L03) + ANEXO C — INT-02 (PD-C09)"
 projects_affected:
   - "crm"
-  - "erp-vendas"
-  - "licitacoes"
-promoted_to_questionnaire: true
-promoted_at: "2026-04-15"
-promoted_question: "Para cada campo do documento, especifique: (1) Formato esperado (ex: CPF, email, número), (2) Range de valores válidos, (3) Se é obrigatório"
+promoted_to_questionnaire: false
+promoted_at: null
+promoted_question: null
+notes: "Pendencia: ao chegar via formulario, Lead e automaticamente atribuido a vendedor ou fica em fila para o Gerente distribuir? Ver PA-L01 no ANEXO A."
 ```
 
 ### Entry 002
 ```yaml
 id: "002"
-date_first_occurred: "2026-04-12"
-date_last_occurred: "2026-04-12"
+date_first_occurred: "2026-04-30"
+date_last_occurred: "2026-04-30"
 frequency: 1
-context: "Arquiteto de Processos bloqueou aguardando condição de saída de loop"
-missing_info_type: "Critério de saída de loops/repetições em processos"
-section_affected: "ANEXO A (Process Details) — Fluxos Principais"
+context: "Elicitacao passagem 1 — Bloco 2 (Jornada do Lead)"
+missing_info_type: "Contagem do timeout de 5 dias (a partir da criacao vs ultima interacao)"
+section_affected: "ANEXO A — P-01 (RN-L01) + ANEXO B — Lead (ultima_interacao_em)"
 projects_affected:
-  - "workflow-aprovacao"
+  - "crm"
 promoted_to_questionnaire: false
 promoted_at: null
 promoted_question: null
+notes: "Pendencia: timeout de 5 dias conta a partir da criacao do Lead ou da ultima interacao registrada? Ver PA-L02 no ANEXO A."
 ```
 
 ### Entry 003
 ```yaml
 id: "003"
-date_first_occurred: "2026-04-14"
-date_last_occurred: "2026-04-15"
-frequency: 2
-context: "Arquiteto de Documentos bloqueou por falta de cardinalidade de relacionamentos"
-missing_info_type: "Cardinalidade de relacionamentos entre documentos (1:1, 1:N, N:N)"
-section_affected: "ANEXO B (Data Models) — Relacionamentos"
+date_first_occurred: "2026-04-30"
+date_last_occurred: "2026-04-30"
+frequency: 1
+context: "Elicitacao passagem 1 — escopo"
+missing_info_type: "Suporte a Contato sem Conta (pessoa fisica / modelo B2C)"
+section_affected: "ANEXO B — Entidade Contato (PD-B02)"
 projects_affected:
   - "crm"
-  - "licitacoes"
 promoted_to_questionnaire: false
 promoted_at: null
 promoted_question: null
+notes: "Passagem 1 define apenas B2B (Contato sempre vinculado a Conta). Suporte B2C adiado para Fase 2."
 ```
 
--->
-
----
-
-## Estatísticas
-
-**Total de Lições**: 0
-**Lições Promovidas para Questionário**: 0
-**Taxa de Promoção**: N/A
-
-**Top 3 Seções com Mais Gaps**:
-1. (Aguardando dados)
-2. (Aguardando dados)
-3. (Aguardando dados)
-
-**Top 3 Tipos de Informação Faltante**:
-1. (Aguardando dados)
-2. (Aguardando dados)
-3. (Aguardando dados)
-
----
-
-## Notas de Uso
-
-### Para o Orquestrador (Giovanna)
-
-**Quando registrar uma lição**:
-1. Arquiteto reporta bloqueio aguardando informação do cliente
-2. Você identifica exatamente:
-   - Qual informação faltou (específico)
-   - Em qual seção do PRD deveria estar
-   - Contexto do bloqueio (o que Arquiteto estava tentando gerar)
-3. Perguntar ao cliente: "Deseja registrar essa lição para melhorar futuros projetos?"
-4. Se cliente aprovar, adicionar entrada neste arquivo
-
-**Formato de entrada**:
+### Entry 004
 ```yaml
-### Entry {id_sequencial}
-```yaml
-id: "{id_sequencial_com_zeros: 001, 002, etc}"
-date_first_occurred: "{YYYY-MM-DD quando ocorreu pela primeira vez}"
-date_last_occurred: "{YYYY-MM-DD quando ocorreu pela última vez}"
-frequency: {número de vezes que ocorreu}
-context: "{Descrição concisa do bloqueio}"
-missing_info_type: "{Tipo específico de informação que faltou}"
-section_affected: "{Seção do PRD ou Anexo onde deveria estar}"
+id: "004"
+date_first_occurred: "2026-04-30"
+date_last_occurred: "2026-04-30"
+frequency: 1
+context: "Elicitacao passagem 1 — ANEXO C (INT-01b)"
+missing_info_type: "Mecanismo e contrato da integracao sistemica com Sistema da Engenharia"
+section_affected: "ANEXO C — INT-01b"
 projects_affected:
-  - "{project_alias_1}"
-  - "{project_alias_2}"
-promoted_to_questionnaire: {true/false}
-promoted_at: "{YYYY-MM-DD ou null}"
-promoted_question: "{Pergunta sugerida para questionário ou null}"
+  - "crm"
+promoted_to_questionnaire: false
+promoted_at: null
+promoted_question: null
+notes: "MVP usa apenas e-mail (INT-01a). Integracao sistemica (webhook/fila/API) e Pos-MVP. Mecanismo, payload e seguranca a definir."
 ```
+
+### Entry 005
+```yaml
+id: "005"
+date_first_occurred: "2026-04-30"
+date_last_occurred: "2026-04-30"
+frequency: 1
+context: "Elicitacao passagem 1 — Secao 9 (NFRs)"
+missing_info_type: "NFRs: performance, compliance/LGPD, disponibilidade, auditoria"
+section_affected: "PRD Secao 9 — Non-Functional Requirements"
+projects_affected:
+  - "crm"
+promoted_to_questionnaire: false
+promoted_at: null
+promoted_question: null
+notes: "Cliente informou 'sem restricoes' na passagem 1. NFRs registrados como [A DEFINIR] para refinamento no ciclo VE."
 ```
 
-**Quando promover para questionário**:
-- Quando `frequency >= 3`
-- Apresentar ao cliente:
-  ```
-  ⚠️ **Lição Recorrente Detectada**
+### Entry 006
+```yaml
+id: "006"
+date_first_occurred: "2026-04-30"
+date_last_occurred: "2026-04-30"
+frequency: 1
+context: "Elicitacao passagem 1 — escopo Fase 2"
+missing_info_type: "Atividades, Historico de Interacoes, Tickets pos-venda e jornada do Atendimento"
+section_affected: "PRD Secao 4 (Jornada Atendimento) + ANEXO A P-04 + ANEXO B BC-02"
+projects_affected:
+  - "crm"
+promoted_to_questionnaire: false
+promoted_at: null
+promoted_question: null
+notes: "Escopo total inclui Atividades, Historico de Interacoes e Tickets. Todos adiados para Fase 2. Persona Atendimento sem jornada detalhada no MVP."
+```
 
-  Esta lição ocorreu {frequency} vezes em diferentes projetos:
-  {lista de projetos afetados}
+### Entry 007
+```yaml
+id: "007"
+date_first_occurred: "2026-04-30"
+date_last_occurred: "2026-04-30"
+frequency: 1
+context: "Elicitacao passagem 1 — Bloco 4 (MotivoPerda)"
+missing_info_type: "Lista fixa de motivos de perda (possivel refinamento futuro)"
+section_affected: "ANEXO B — Oportunidade (motivo_perda) + UBIQUITOUS_LANGUAGE (MotivoPerda)"
+projects_affected:
+  - "crm"
+promoted_to_questionnaire: false
+promoted_at: null
+promoted_question: null
+notes: "Passagem 1 define texto livre. Lista fixa (preco, concorrente, timing, sem fit) e possivel refinamento para ciclo futuro."
+```
 
-  Informação faltante: {missing_info_type}
-  Seção afetada: {section_affected}
-
-  Pergunta sugerida para adicionar ao questionário do Analista:
-  "{promoted_question}"
-
-  Deseja promover agora?
-  [S] Sim, adicionar ao questionário
-  [N] Não, manter apenas no log
-  ```
-- Se cliente aprovar: atualizar entrada (promoted_to_questionnaire: true, promoted_at, promoted_question)
-- Notificar time técnico para adicionar pergunta ao skill do Analista
-
-**Incrementar frequência**:
-- Se lição já existe (mesmo `missing_info_type` + mesma `section_affected`):
-  - Incrementar `frequency++`
-  - Atualizar `date_last_occurred`
-  - Adicionar projeto à lista `projects_affected`
+### Entry 008
+```yaml
+id: "008"
+date_first_occurred: "2026-04-30"
+date_last_occurred: "2026-04-30"
+frequency: 1
+context: "Elicitacao passagem 1 — regras de negocio"
+missing_info_type: "Criterios de qualificacao de Lead + regras detalhadas de redistribuicao de Oportunidade pelo Gerente"
+section_affected: "ANEXO A — P-01 e P-02 + ANEXO B — Lead e Oportunidade"
+projects_affected:
+  - "crm"
+promoted_to_questionnaire: false
+promoted_at: null
+promoted_question: null
+notes: "Criterios que tornam um Lead 'Qualificado' nao foram detalhados (decisao do Vendedor, sem regra sistematica). Regras de redistribuicao (notificacao ao vendedor anterior, restricoes de momento) nao detalhadas."
+```
 
 ---
 
-### Para o Analista de Negócio (Sofia)
+## Estatisticas
 
-**Como usar este log**:
-1. Antes de iniciar mapeamento, consultar este arquivo
-2. Identificar lições promovidas (`promoted_to_questionnaire: true`)
-3. Incorporar perguntas promovidas ao questionário de elicitação
-4. Durante mapeamento, se cliente não souber responder pergunta promovida, documentar no PRD com flag `[PENDENTE_VALIDACAO]` e alertar Orquestrador
+**Total de Pendencias Registradas**: 8
+**Pendencias Promovidas para Questionario**: 0
+**Ciclo de Refinamento Previsto**: VE (Validacao de Especificacao)
 
----
-
-### Para Arquitetos (Documentos, Processos, Integrações)
-
-**Como usar este log**:
-1. Antes de gerar specs, consultar lições relacionadas à sua área:
-   - Arquiteto de Documentos: lições em "ANEXO B" ou "Seção 10"
-   - Arquiteto de Processos: lições em "ANEXO A"
-   - Arquiteto de Integrações: lições em "ANEXO C"
-2. Se informação crítica ainda faltando no PRD, bloquear e reportar ao Orquestrador (como sempre)
-3. Orquestrador verificará se lição já existe antes de registrar novamente
+**Grupos de Pendencias**:
+1. Regras de negocio nao detalhadas (3 entradas: 001, 002, 008)
+2. Escopo Fase 2 (2 entradas: 003, 006)
+3. Integracoes nao detalhadas (1 entrada: 004)
+4. NFRs (1 entrada: 005)
+5. Refinamentos opcionais (1 entrada: 007)
 
 ---
 
 ## Changelog
 
-- **2026-04-15**: Estrutura inicial criada (v1.0)
-  - Sistema de registro de lições com frequência
-  - Promoção automática para questionário quando frequency >= 3
-  - Rastreamento por projeto, seção do PRD, e tipo de informação faltante
+- **2026-04-30**: Estrutura inicial criada (v1.0) — template vazio
+- **2026-04-30**: v1.1 — 8 pendencias registradas ao final da passagem 1 da sessao MP

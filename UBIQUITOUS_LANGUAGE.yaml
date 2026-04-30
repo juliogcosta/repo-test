@@ -1,334 +1,385 @@
 # UBIQUITOUS_LANGUAGE.yaml
-# Glossário Versionado - Fonte da Verdade para Linguagem Ubíqua
-# Git-tracked, mantido continuamente pelo Guardião de Linguagem Ubíqua
+# Glossario Versionado - Fonte da Verdade para Linguagem Ubiqua
+# Git-tracked, mantido continuamente pelo Guardiao de Linguagem Ubiqua
 #
 # === Arquivos Relacionados (v3.2.0 — Eixo B Implementation Layer) ===
-# Este arquivo é o glossário BUSINESS-CANÔNICO. Para mapeamentos:
-#   - business ↔ design conceitual: claude/TERMINOLOGY_MAP.yaml
-#   - design ↔ implementation (arquivo/classe): IMPLEMENTATION_MAP.yaml
+# Este arquivo e o glossario BUSINESS-CANONICO. Para mapeamentos:
+#   - business <-> design conceitual: claude/TERMINOLOGY_MAP.yaml
+#   - design <-> implementation (arquivo/classe): IMPLEMENTATION_MAP.yaml
 # ====================================================================
 
 metadata:
-  project: "crm"  # Ex: licitacoes
-  version: "1.0"
+  project: "crm"
+  version: "1.1"
   last_updated: "2026-04-30"
-  maintainer: "Guardião de Linguagem Ubíqua"
+  maintainer: "Analista de Negocio (Sofia) + Guardiao de Linguagem Ubiqua"
   bounded_contexts:
-    - "[bc1]"  # Ex: licitacao
-    - "[bc2]"  # Ex: proposta
-    - "[bc3]"  # Ex: contrato
+    - "comercial"
+    - "posvenda"
 
 # ==============================================================================
-# GLOSSÁRIO GLOBAL
+# GLOSSARIO GLOBAL
 # Termos compartilhados entre todos os Bounded Contexts
 # ==============================================================================
 
 global_terms:
-  - term: "[Termo Global]"
-    definition: "[Definição precisa e não ambígua do termo]"
-    synonyms: []  # Sinônimos aceitos (usar com cautela!)
-    forbidden_synonyms: ["[termo proibido]"]  # Termos que NÃO devem ser usados
-    type: "[Actor | Aggregate | ValueObject | Event | Command | Process | System]"
-    related_terms: ["[termo relacionado 1]", "[termo relacionado 2]"]
-    examples:
-      - "[Exemplo de uso correto do termo]"
-    notes: "[Observações adicionais, contexto histórico, etc]"
-    added_date: "2026-04-30"
-    added_by: "[Nome do agente ou pessoa]"
-
-  # EXEMPLO CONCRETO:
-  - term: "Licitante"
-    definition: "Pessoa jurídica (empresa) que submete proposta em processo licitatório público"
+  - term: "VendedorResponsavel"
+    definition: "Usuario com perfil Vendedor designado como responsavel por um Lead ou Oportunidade. Determina visibilidade e accountability do registro."
     synonyms: []
-    forbidden_synonyms: ["empresa participante", "ofertante", "concorrente"]
-    type: "Actor"
-    related_terms: ["Proposta", "Licitacao"]
+    forbidden_synonyms: ["dono", "owner", "proprietario do lead"]
+    type: "Role"
+    related_terms: ["Lead", "Oportunidade", "GerenteComercial"]
     examples:
-      - "O Licitante deve cadastrar CNPJ antes de submeter Proposta"
-      - "Cada Licitante pode submeter múltiplas Propostas para a mesma Licitação"
-    notes: "Termo técnico da legislação de licitações públicas (Lei 14.133/2021)"
-    added_date: "2026-04-15"
-    added_by: "Analista de Domínio (Sofia)"
+      - "O VendedorResponsavel pelo Lead recebe o alerta de 5 dias sem contato."
+      - "A Oportunidade tem sempre um VendedorResponsavel, que pode ser redistribuido pelo Gerente."
+    notes: "Papel desempenhado por usuario com perfil Vendedor. Diferente de 'criado_por'."
+    added_date: "2026-04-30"
+    added_by: "Analista de Negocio (Sofia)"
+
+  - term: "Conversao"
+    definition: "Ato de transformar um Lead qualificado em Conta + Oportunidade. Evento irreversivel que preserva o Lead como historico com estado Convertido."
+    synonyms: []
+    forbidden_synonyms: ["upgrade de lead", "promover lead", "transformar lead"]
+    type: "Process"
+    related_terms: ["Lead", "Conta", "Oportunidade", "LeadConvertido"]
+    examples:
+      - "Apos a Conversao, o Lead fica com status Convertido e uma Conta e uma Oportunidade sao criadas automaticamente."
+    notes: "Transicao Qualificado -> Convertido. Nao confundir com 'criar Conta manualmente'."
+    added_date: "2026-04-30"
+    added_by: "Analista de Negocio (Sofia)"
 
 # ==============================================================================
-# GLOSSÁRIO POR BOUNDED CONTEXT
-# Termos específicos de cada Bounded Context (podem ter significado diferente em outro BC)
+# GLOSSARIO POR BOUNDED CONTEXT
 # ==============================================================================
 
 bounded_context_terms:
-  # Bounded Context 1
-  "[nome_bc_1]":  # Ex: licitacao
-    - term: "[Termo Específico do BC]"
-      definition: "[Definição APENAS neste contexto]"
-      scope: "Apenas neste BC. Em outros BCs pode ter significado diferente."
-      aggregate: true  # Se for um Aggregate Root
-      value_object: false
-      entity: false
-      domain_event: false
-      invariants:
-        - "[Invariante 1 protegida por este conceito]"
-        - "[Invariante 2]"
-      commands:
-        - command: "[Comando 1]"
-          event_result: "[Evento resultante]"
-      examples:
-        - "[Exemplo de uso neste BC]"
-      notes: "[Observações]"
-
-    # EXEMPLO CONCRETO:
-    - term: "Licitacao"
-      definition: "Processo formal de contratação pública, com prazos, critérios e fases regulamentadas"
-      scope: "Aggregate Root do BC 'licitacao'. Em outros BCs é apenas referência (ID)."
+  comercial:
+    - term: "Lead"
+      definition: "Registro de um potencial cliente capturado via formulario web ou entrada manual, antes de qualquer confirmacao de interesse ou qualificacao formal."
+      scope: "Aggregate Root do BC comercial. Possui ciclo de vida proprio com estados definidos."
       aggregate: true
       value_object: false
       entity: false
       domain_event: false
       invariants:
-        - "Uma Licitação só pode ter UM vencedor"
-        - "Prazo de submissão deve ser no futuro ao criar Licitação"
-        - "Licitação CANCELADA não pode voltar para ABERTA"
+        - "Lead Convertido ou Descartado nao pode mudar de estado."
+        - "ultima_interacao_em e atualizado a cada interacao registrada."
+        - "conta_id e oportunidade_id so sao preenchidos quando status = Convertido."
+        - "Alerta disparado quando (agora - ultima_interacao_em) >= 5 dias e status nao e Convertido nem Descartado."
       commands:
-        - command: "Criar Licitacao"
-          event_result: "Licitacao Criada"
-        - command: "Cancelar Licitacao"
-          event_result: "Licitacao Cancelada"
+        - command: "Criar Lead (formulario web)"
+          event_result: "LeadCriado (criado_por = Sistema)"
+        - command: "Criar Lead (manual)"
+          event_result: "LeadCriado (criado_por = Vendedor | Gerente)"
+        - command: "Converter Lead"
+          event_result: "LeadConvertido + ContaCriada + OportunidadeCriada"
+        - command: "Descartar Lead"
+          event_result: "LeadDescartado"
       examples:
-        - "Licitação 001/2026 para aquisição de equipamentos de TI"
-      notes: "Status possíveis: ABERTA, FECHADA, CANCELADA"
+        - "Lead 'Empresa XYZ' chegou via formulario web com status Novo."
+        - "Vendedor qualificou o Lead apos ligacao e moveu para Qualificado."
+      notes: "Status possíveis: Novo, EmContato, Qualificado, Convertido, Descartado. Leads nunca sao excluidos."
 
-  # Bounded Context 2
-  "[nome_bc_2]":  # Ex: proposta
-    - term: "Validacao"
-      definition: "Verificação automática de conformidade da Proposta com critérios técnicos (CNPJ, documentos obrigatórios, valores)"
-      scope: "Neste BC = validação TÉCNICA automática. No BC 'contrato', 'Validacao' refere-se à validação JURÍDICA manual."
+    - term: "Conta"
+      definition: "Representacao de uma empresa cliente no CRM. Criada automaticamente na Conversao de Lead ou manualmente pelo Gerente. Agrupa Contatos e Oportunidades."
+      scope: "Aggregate Root do BC comercial."
+      aggregate: true
+      value_object: false
+      entity: false
+      domain_event: false
+      invariants:
+        - "Uma Conta pode ter N Contatos (1:N)."
+        - "Uma Conta pode ter N Oportunidades ao longo do tempo."
+      commands:
+        - command: "Criar Conta"
+          event_result: "ContaCriada"
+      examples:
+        - "Conta 'Ycodify Ltda' criada automaticamente apos conversao do Lead 'Julio Costa'."
+      notes: "Modelo B2B. Suporte a contato sem conta (pessoa fisica) e Fase 2."
+
+    - term: "Contato"
+      definition: "Pessoa fisica vinculada a uma Conta, representando um interlocutor da empresa cliente. Nao e Aggregate Root — e entidade filha da Conta."
+      scope: "Entidade filha de Conta no BC comercial."
       aggregate: false
-      value_object: true
+      value_object: false
+      entity: true
+      domain_event: false
+      invariants:
+        - "Todo Contato pertence a uma Conta (conta_id obrigatorio no MVP)."
+        - "Cada Conta possui exatamente um Contato marcado como principal (principal = true)."
+      commands: []
+      examples:
+        - "Contato 'Maria Silva', cargo 'CEO', vinculada a Conta 'Empresa ABC'."
+      notes: "Cardinalidade: 1 Conta : N Contatos. Suporte a Contato sem Conta e Fase 2."
+
+    - term: "Oportunidade"
+      definition: "Negociacao comercial em andamento com uma Conta, representando uma possibilidade concreta de venda. Possui estagio, valor estimado obrigatorio e pode resultar em Ganha ou Perdida."
+      scope: "Aggregate Root do BC comercial."
+      aggregate: true
+      value_object: false
+      entity: false
+      domain_event: false
+      invariants:
+        - "valor_estimado e sempre obrigatorio (nao pode ser nulo ou zero)."
+        - "Oportunidade Ganha ou Perdida nao pode mudar de estagio."
+        - "motivo_perda obrigatorio quando e somente quando estagio = Perdida."
+        - "fechado_em preenchido somente quando estagio = Ganha ou Perdida."
+      commands:
+        - command: "Criar Oportunidade"
+          event_result: "OportunidadeCriada"
+        - command: "Marcar como Ganha"
+          event_result: "OportunidadeGanha"
+        - command: "Marcar como Perdida (com motivoPerda)"
+          event_result: "OportunidadePerdida"
+        - command: "Redistribuir Oportunidade"
+          event_result: "OportunidadeResponsavelAlterado"
+      examples:
+        - "Oportunidade 'Implantacao CRM' para Conta 'Empresa XYZ', valor estimado R$ 50.000, estagio Negociacao."
+      notes: "Estagios: PropostaEnviada, Negociacao, Fechamento, Ganha, Perdida."
+
+    - term: "Pipeline"
+      definition: "Visao agregada das Oportunidades ativas por estagio, representando o funil de vendas do time comercial."
+      scope: "Read model / conceito de navegacao no BC comercial. Nao e Aggregate."
+      aggregate: false
+      value_object: false
       entity: false
       domain_event: false
       invariants: []
       commands: []
       examples:
-        - "Validacao falhou: CNPJ inválido"
-        - "Validacao bem-sucedida: todos os documentos presentes"
-      notes: "NÃO confundir com 'Aprovacao' (que é decisão humana do Gestor)"
+        - "O Pipeline do Gerente mostra 5 oportunidades em PropostaEnviada, 3 em Negociacao, 2 em Fechamento."
+      notes: "Representacao visual do funil. Dados derivados das Oportunidades com estagio != Ganha e != Perdida."
+
+    - term: "EstagioOportunidade"
+      definition: "Valor enumerado que representa a fase atual de uma Oportunidade no ciclo de vendas."
+      scope: "Value Object no BC comercial."
+      aggregate: false
+      value_object: true
+      entity: false
+      domain_event: false
+      invariants:
+        - "Valores validos: PropostaEnviada, Negociacao, Fechamento, Ganha, Perdida."
+        - "Transicao para Perdida exige motivo_perda preenchido."
+      commands: []
+      examples:
+        - "EstagioOportunidade transicionou de Negociacao para Fechamento."
+      notes: "Progride linearmente PropostaEnviada -> Negociacao -> Fechamento -> Ganha|Perdida."
+
+    - term: "MotivoPerda"
+      definition: "Texto livre obrigatorio preenchido pelo Vendedor ou Gerente Comercial ao marcar uma Oportunidade como Perdida, descrevendo a razao do nao-fechamento."
+      scope: "Value Object no BC comercial. Atributo da Oportunidade."
+      aggregate: false
+      value_object: true
+      entity: false
+      domain_event: false
+      invariants:
+        - "Obrigatorio quando e somente quando EstagioOportunidade = Perdida."
+        - "Texto livre — sem lista de valores fixos no MVP."
+      commands: []
+      examples:
+        - "MotivoPerda: 'Cliente optou por solucao concorrente com menor custo'."
+        - "MotivoPerda: 'Orcamento cancelado por restricoes internas'."
+      notes: "Lista fixa de motivos e possivel refinamento para ciclo futuro."
+
+    - term: "ValorEstimado"
+      definition: "Valor monetario em reais (R$) que representa a estimativa do negocio a ser fechado em uma Oportunidade. Campo obrigatorio."
+      scope: "Value Object no BC comercial. Atributo da Oportunidade."
+      aggregate: false
+      value_object: true
+      entity: false
+      domain_event: false
+      invariants:
+        - "Sempre obrigatorio na Oportunidade — nao pode ser nulo."
+        - "Unidade monetaria: BRL (Real Brasileiro)."
+      commands: []
+      examples:
+        - "ValorEstimado: R$ 120.000,00 para contrato anual de plataforma."
+      notes: "No MVP e estimativa do vendedor. Refinamento (valor contratado vs estimado) e ciclo futuro."
+
+    - term: "HistoricoVenda"
+      definition: "Projecao (read model) derivada de todas as Oportunidades com estagio = Ganha. Apresenta registros individuais e metricas agregadas. Nao e uma entidade com escrita propria."
+      scope: "Projection / Query Model no BC comercial. Nao e Aggregate."
+      aggregate: false
+      value_object: false
+      entity: false
+      domain_event: false
+      invariants:
+        - "Somente leitura — nenhuma alteracao e permitida."
+        - "Dados derivados de Oportunidades Ganhas. Nao ha tabela/colecao independente."
+        - "Visibilidade segue a mesma matriz de perfis das Oportunidades."
+      commands: []
+      examples:
+        - "HistoricoVenda exibe total de R$ 350.000 em vendas do trimestre para o Gestor."
+        - "Vendedor ve apenas suas proprias Oportunidades Ganhas no HistoricoVenda."
+      notes: "Conceito CQRS: separacao leitura/escrita. Dados originados no Aggregate Oportunidade."
+
+    - term: "OportunidadeGanha"
+      definition: "Evento de dominio disparado quando uma Oportunidade transiciona para o estagio Ganha. Aciona envio de e-mail para Engenharia (MVP) e futura integracao sistemica (Pos-MVP)."
+      scope: "Domain Event no BC comercial."
+      aggregate: false
+      value_object: false
+      entity: false
+      domain_event: true
+      invariants:
+        - "Irreversivel — Oportunidade Ganha nao pode mudar de estagio."
+      commands: []
+      examples:
+        - "OportunidadeGanha disparado: CRM envia e-mail automatico para equipe de Engenharia."
+      notes: "Evento de negocio de alta relevancia. Inicia o fluxo pos-venda na Engenharia."
+
+    - term: "OportunidadePerdida"
+      definition: "Evento de dominio disparado quando uma Oportunidade transiciona para o estagio Perdida, com motivo_perda obrigatorio registrado."
+      scope: "Domain Event no BC comercial."
+      aggregate: false
+      value_object: false
+      entity: false
+      domain_event: true
+      invariants:
+        - "Irreversivel — Oportunidade Perdida nao pode mudar de estagio."
+        - "So pode ser disparado se motivo_perda foi fornecido."
+      commands: []
+      examples:
+        - "OportunidadePerdida disparado com motivo: 'Preco acima do orcamento do cliente'."
+      notes: ""
+
+  posvenda:
+    - term: "Ticket"
+      definition: "Registro de solicitacao de suporte ou atendimento pos-venda vinculado a uma Conta. Detalhamento adiado para Fase 2."
+      scope: "Aggregate Root do BC posvenda — Fase 2, fora do MVP."
+      aggregate: true
+      value_object: false
+      entity: false
+      domain_event: false
+      invariants: []
+      commands: []
+      examples:
+        - "Ticket aberto pela Conta 'Empresa XYZ' reportando problema de acesso."
+      notes: "BC posvenda completo e Fase 2. Nao detalhar no MVP."
 
 # ==============================================================================
 # CONTEXT MAPPING
-# Mapeamento de termos entre Bounded Contexts (tradução semântica)
 # ==============================================================================
 
 context_mappings:
-  - source_bc: "[bc_origem]"
-    target_bc: "[bc_destino]"
-    relationship: "[Partnership | Shared-Kernel | Customer-Supplier | Conformist | Anti-Corruption-Layer]"
-    shared_terms:
-      - term: "[termo no BC origem]"
-        translation: "[termo no BC destino]"
-        note: "[Observações sobre a tradução]"
-
-  # EXEMPLO CONCRETO:
-  - source_bc: "licitacao"
-    target_bc: "proposta"
+  - source_bc: "comercial"
+    target_bc: "posvenda"
     relationship: "Customer-Supplier"
     shared_terms:
-      - term: "LicitacaoId"
-        translation: "propostaLicitacaoId"
-        note: "Mesmo conceito (ID da licitação), naming diferente por convenção do BC"
-
-      - term: "Prazo de Submissao"
-        translation: "Deadline"
-        note: "BC 'proposta' usa termo em inglês por preferência do time"
-
-  - source_bc: "proposta"
-    target_bc: "contrato"
-    relationship: "Anti-Corruption-Layer"
-    shared_terms:
-      - term: "Proposta Aprovada"
-        translation: "Contrato Em Elaboracao"
-        note: "Tradução semântica: aprovação no BC 'proposta' inicia elaboração no BC 'contrato'"
+      - term: "Conta"
+        translation: "Conta (referencia por ID)"
+        note: "BC posvenda referencia Conta por conta_id. Nao acessa o Aggregate diretamente."
 
 # ==============================================================================
-# TERMOS AMBÍGUOS DETECTADOS
-# Termos usados com múltiplos significados (a resolver)
+# TERMOS AMBIGUOS DETECTADOS
 # ==============================================================================
 
-ambiguous_terms:
-  - term: "[Termo Ambíguo]"
-    issue: "[Descrição do problema de ambiguidade]"
-    occurrences:
-      - context: "[Onde foi usado]"
-        meaning: "[Significado inferido]"
-        timestamp: "2026-04-30THH:MM:SS"
-        agent: "[Quem usou]"
-    resolution_status: "pending | resolved | wont-fix"
-    resolution_notes: "[Como foi resolvido, se aplicável]"
-
-  # EXEMPLO CONCRETO:
-  - term: "Aprovacao"
-    issue: "Usado com 3 significados diferentes: aprovação técnica, aprovação jurídica, aprovação final"
-    occurrences:
-      - context: "Analista mencionou: 'após aprovação, gera contrato'"
-        meaning: "Provavelmente aprovação final (técnica + jurídica)"
-        timestamp: "2026-04-15T10:30:00"
-        agent: "Analista de Domínio"
-      - context: "Cliente: 'Gestor faz aprovação rápida'"
-        meaning: "Apenas aprovação técnica (não inclui jurídica)"
-        timestamp: "2026-04-15T11:15:00"
-        agent: "Cliente"
-    resolution_status: "pending"
-    resolution_notes: "Aguardando decisão: criar termos distintos (AprovacaoTecnica, AprovacaoJuridica) ou manter genérico?"
+ambiguous_terms: []
 
 # ==============================================================================
 # SEMANTIC DRIFT LOG
-# Registro de desvios semânticos detectados pelo Guardião
 # ==============================================================================
 
-semantic_drift_log:
-  - term: "[Termo]"
-    drift_type: "[meaning-shift | scope-creep | synonym-introduction]"
-    detected_at: "2026-04-30THH:MM:SS"
-    description: "[Descrição do drift]"
-    glossary_definition: "[Definição no glossário]"
-    observed_usage: "[Como estava sendo usado]"
-    similarity_score: 0.72  # Cosine similarity (0-1, threshold típico: 0.85)
-    corrective_action: "[O que foi feito para corrigir]"
-    corrected_by: "[Guardião | Orquestrador | Analista]"
-
-  # EXEMPLO CONCRETO:
-  - term: "Proposta"
-    drift_type: "synonym-introduction"
-    detected_at: "2026-04-15T14:20:00"
-    description: "Cliente começou a usar 'oferta' como sinônimo de 'Proposta'"
-    glossary_definition: "Documento formal submetido por Licitante em resposta a Licitação"
-    observed_usage: "Cliente: 'Empresa envia oferta com valor de R$ 100k'"
-    similarity_score: 0.68
-    corrective_action: "Guardião alertou, Analista corrigiu: 'oferta' → 'Proposta'"
-    corrected_by: "Guardião (alerta) + Analista de Domínio (correção)"
+semantic_drift_log: []
 
 # ==============================================================================
 # FORBIDDEN PATTERNS
-# Padrões de linguagem que devem ser evitados
 # ==============================================================================
 
 forbidden_patterns:
-  - pattern: "[Padrão a evitar]"
-    reason: "[Por que é proibido]"
-    replacement: "[O que usar no lugar]"
+  - pattern: "Usar 'cliente' sem especificar se e Lead, Conta ou Contato"
+    reason: "No dominio CRM, 'cliente' e ambiguo — pode ser Lead (potencial), Conta (empresa) ou Contato (pessoa)"
+    replacement: "Usar Lead, Conta ou Contato conforme o contexto"
     examples:
-      - wrong: "[Exemplo errado]"
-        correct: "[Exemplo correto]"
+      - wrong: "O cliente enviou uma mensagem"
+        correct: "O Contato 'Maria Silva' da Conta 'Empresa XYZ' enviou uma mensagem"
 
-  # EXEMPLOS CONCRETOS:
-  - pattern: "Usar 'status' genérico sem especificar contexto"
-    reason: "Cada BC tem enum de status diferente, gera ambiguidade"
-    replacement: "Usar 'StatusLicitacao', 'StatusProposta', 'StatusContrato'"
+  - pattern: "Usar 'status' sem prefixo de contexto"
+    reason: "Lead e Oportunidade possuem enums de status diferentes"
+    replacement: "Usar 'status do Lead' ou 'estagio da Oportunidade'"
     examples:
-      - wrong: "A licitação mudou de status"
-        correct: "A licitação mudou de StatusLicitacao: ABERTA → FECHADA"
+      - wrong: "Mudar o status para fechado"
+        correct: "Marcar Oportunidade como Ganha (EstagioOportunidade = Ganha)"
 
-  - pattern: "Usar verbos genéricos (processar, validar, aprovar) sem objeto"
-    reason: "Não fica claro O QUE está sendo processado/validado/aprovado"
-    replacement: "Sempre especificar objeto: 'Validar Proposta', 'Aprovar Licitacao'"
+  - pattern: "Usar 'negocio' como sinonimo de Oportunidade"
+    reason: "Gera ambiguidade — 'negocio' pode ser empresa (Conta) ou oportunidade comercial"
+    replacement: "Usar Oportunidade para o registro de negociacao e Conta para a empresa"
     examples:
-      - wrong: "Sistema valida e depois aprova"
-        correct: "Sistema valida Proposta (CNPJ + documentos) e depois Gestor aprova Proposta"
+      - wrong: "Fechei o negocio com a empresa"
+        correct: "A Oportunidade foi marcada como Ganha para a Conta 'Empresa XYZ'"
 
 # ==============================================================================
 # VALIDATION RULES
-# Regras de validação que o Guardião aplica
 # ==============================================================================
 
 validation_rules:
   - rule_id: "VR-001"
-    rule_name: "Termo deve estar no glossário"
-    severity: "error | warning | info"
-    description: "Todo termo usado em conversas/documentos deve existir no glossário (global ou BC-específico)"
-    action_on_violation: "Alertar agente, solicitar definição se novo termo"
+    rule_name: "Termo deve estar no glossario"
+    severity: "warning"
+    description: "Todo termo de dominio usado em documentos deve existir no glossario"
+    action_on_violation: "Alertar, solicitar definicao se novo termo"
 
   - rule_id: "VR-002"
-    rule_name: "Forbidden synonyms não podem ser usados"
+    rule_name: "Forbidden synonyms nao podem ser usados"
     severity: "error"
-    description: "Termos em forbidden_synonyms geram erro e sugestão de termo correto"
-    action_on_violation: "Bloquear (strict mode) ou alertar (permissive mode)"
+    description: "Termos em forbidden_synonyms geram erro e sugestao de termo correto"
+    action_on_violation: "Alertar (permissive mode)"
 
   - rule_id: "VR-003"
     rule_name: "Aggregates devem ser usados no BC correto"
     severity: "error"
-    description: "Aggregate de BC1 não pode ser usado diretamente em BC2 (apenas via ID ou tradução)"
-    action_on_violation: "Alertar sobre violação de fronteira de BC, sugerir Anti-Corruption Layer"
+    description: "Aggregate de BC1 nao pode ser usado diretamente em BC2 (apenas via ID)"
+    action_on_violation: "Alertar sobre violacao de fronteira de BC"
 
   - rule_id: "VR-004"
-    rule_name: "Termos ambíguos devem ser esclarecidos"
+    rule_name: "Termos ambiguos devem ser esclarecidos"
     severity: "warning"
-    description: "Se termo está em ambiguous_terms, solicitar esclarecimento de contexto"
-    action_on_violation: "Pausar workflow, solicitar ao Orquestrador decisão de resolução"
+    description: "Se termo esta em ambiguous_terms, solicitar esclarecimento de contexto"
+    action_on_violation: "Registrar pendencia, continuar com flag [A DEFINIR]"
 
 # ==============================================================================
 # CHANGELOG
-# Histórico de mudanças no glossário (Git-like)
 # ==============================================================================
 
 changelog:
   - version: "1.0"
     date: "2026-04-30"
-    author: "[Nome]"
-    changes: "Versão inicial do glossário"
+    author: "Sistema (init)"
+    changes: "Versao inicial do glossario — template vazio"
     terms_added: []
     terms_modified: []
     terms_removed: []
 
-  # EXEMPLO CONCRETO:
   - version: "1.1"
-    date: "2026-04-15"
-    author: "Guardião de Linguagem Ubíqua"
-    changes: "Adicionado termo 'Validacao' com escopo diferenciado por BC"
-    terms_added: ["Validacao"]
+    date: "2026-04-30"
+    author: "Analista de Negocio (Sofia)"
+    changes: "Passagem 1 completa — glossario populado com todos os termos canonicos do dominio CRM"
+    terms_added:
+      - "VendedorResponsavel"
+      - "Conversao"
+      - "Lead"
+      - "Conta"
+      - "Contato"
+      - "Oportunidade"
+      - "Pipeline"
+      - "EstagioOportunidade"
+      - "MotivoPerda"
+      - "ValorEstimado"
+      - "HistoricoVenda"
+      - "OportunidadeGanha"
+      - "OportunidadePerdida"
+      - "Ticket"
     terms_modified: []
-    terms_removed: []
-
-  - version: "1.2"
-    date: "2026-04-16"
-    author: "Analista de Domínio (Sofia)"
-    changes: "Removido 'oferta' de forbidden_synonyms após decisão de usar 'Proposta'"
-    terms_added: []
-    terms_modified: ["Proposta"]
     terms_removed: []
 
 # ==============================================================================
-# STATISTICS (geradas automaticamente pelo Guardião)
+# STATISTICS
 # ==============================================================================
 
 statistics:
-  total_global_terms: 0
-  total_bc_terms: 0
+  total_global_terms: 2
+  total_bc_terms: 12
   total_ambiguous_terms: 0
   total_drift_incidents: 0
-  conformity_rate: 0.00  # % de termos usados que estão no glossário
-  last_drift_check: "2026-04-30THH:MM:SS"
-  most_violated_rule: "[VR-XXX]"
-
-# ==============================================================================
-# NOTES & BEST PRACTICES
-# ==============================================================================
-
-# BEST PRACTICES:
-# 1. Sempre adicionar examples ao definir termo novo
-# 2. Usar forbidden_synonyms agressivamente para prevenir drift
-# 3. Documentar invariantes no Aggregate (ajuda QA de Specs)
-# 4. Revisar ambiguous_terms semanalmente
-# 5. Git commit do UBIQUITOUS_LANGUAGE.yaml após cada mudança significativa
-# 6. Tag versions no Git quando glossário atingir milestones
-
-# NAMING CONVENTIONS:
-# - Termos: PascalCase para Aggregates/Entities, lowercase para outros
-# - BCs: sempre lowercase (ex: licitacao, proposta)
-# - Campos: camelCase (ex: licitacaoId, propostaLicitacaoId)
-
-# INTEGRATION:
-# - Este arquivo é lido por: Guardião, Analista, Arquitetos, QA
-# - Este arquivo é escrito por: Guardião (primariamente), Analista (via Guardião)
-# - Versionamento: Git (branch main = production glossary)
-
-# ==============================================================================
-# END OF TEMPLATE
-# ==============================================================================
+  conformity_rate: 1.00
+  last_drift_check: "2026-04-30T00:00:00"
+  most_violated_rule: "N/A"

@@ -1,0 +1,150 @@
+# project-config.yaml
+# Arquivo de configuração para inicialização de projeto concreto
+# Copiar para projeto concreto e preencher valores
+
+project:
+  # Nome do projeto (será usado como project_name em todos os agentes)
+  # Formato: lowercase, sem espaços, sem acentos (^[a-z]+$)
+  name: "crm"  # Ex: "licitacoes"
+
+  # Nome legível do projeto (alias)
+  alias: "Ycodify CRM - Service"  # Ex: "Sistema de Gestão de Licitações"
+
+  # Nome do cliente/organização
+  client_name: "Ycodify"  # Ex: "Prefeitura Municipal X"
+
+  # Organização (para MCP rosetta-forger)
+  org: "ycodify"  # Ex: "prefeiturax"
+
+  # Brief inicial do projeto
+  brief: "Sistema para atender demandas de captação de clientes, suporte a vendas e relacionamento com clientes da Ycodify"  # Ex: "Sistema para gerenciar licitações públicas com rastreabilidade"
+
+  # Data de início
+  start_date: "2026-04-30"  # Ex: "2026-04-20"
+
+  # Complexidade estimada
+  complexity: "medio"  # Opções: "simples" | "medio" | "complexo"
+
+paths:
+  # Diretório raiz do projeto (será criado se não existir)
+  project_root: "/var/yc/specs/clients/ycodify/client-proj-03-spec"  # Ex: "/home/user/projetos/licitacoes"
+
+  # Diretório para artefatos gerados (relativo ao project_root)
+  artifacts_dir: "artifacts"  # Padrão: "artifacts"
+
+  # Diretório para specs (relativo ao project_root)
+  specs_dir: "specs"  # Padrão: "specs"
+
+# === Configuração de Geração de PRD ===
+prd:
+  # Modo de operação do PRD
+  # "monolithic": PRD.md único (1700+ linhas) - MODO PADRÃO/LEGADO (v3.0)
+  # "fragmented": PRD dividido em 10 seções independentes - NOVO MODO (v3.1)
+  mode: "monolithic"  # Opções: "monolithic" | "fragmented"
+
+  # Compilar PRD completo ao final (apenas para modo fragmented)
+  compile_on_complete: false  # true = gera PRD_COMPILED.md ao final
+
+  # Overlap entre seções (apenas para modo fragmented)
+  # Define quantos % de contexto compartilhar entre seções
+  sections_overlap: 0.1  # 10% de overlap (padrão)
+
+glossary:
+  # Nome do arquivo de glossário
+  filename: "UBIQUITOUS_LANGUAGE.yaml"
+
+  # Versão inicial
+  initial_version: "1.0"
+
+  # Validation mode
+  validation_mode: "permissive"  # Opções: "strict" | "permissive" | "advisory"
+
+  # Bounded Contexts iniciais (se já conhecidos)
+  # TODO: atualmente NÃO consumido pelo init-project.sh — reservado para uso futuro
+  initial_bounded_contexts: [comercial]  # Ex: ["licitacao", "proposta", "contrato"]
+
+mcp:
+  # Parâmetros para MCP rosetta-forger (usados pelo gerente-de-projeto)
+  # NUNCA commitar credenciais reais aqui!
+  authorization: "PREENCHER_VIA_ENV"  # UUID credential (não é JWT)
+  username: "julio"  # Ex: "usuario_forger"
+  # Organização (cliente) no ForgerOne. Em geral reutiliza `project.org`.
+  # Se omitido, o gerente-de-projeto usará `project.org` como fallback.
+  org: ""  # Ex: "prefeiturax" (deixe vazio para herdar de project.org)
+
+agents:
+  # Agentes ativados neste projeto (11 agentes em .claude/agents/ na v3.2.0)
+  enabled:
+    # --- Elicitação e Governança (v3.0+) ---
+    - "orquestrador-pm"           # Giovanna — PM/coordenador
+    - "analista-de-negocio"       # Sofia — BA, PRD e ANEXOS
+    - "assistente-de-projeto"     # Sam — worker operacional (naming, schemas)
+    - "guardiao-linguagem-ubiqua" # Lexicon — validação semântica
+    - "qa-de-specs"               # Quinn — QA pré-impl (PRD ↔ specs JSON)
+    #- "gerente-de-projeto"        # Eixo A: provisionamento Forger via MCP
+    #- "diagrama-designer"         # Diana — diagramas PlantUML
+
+    # --- Eixo B: Implementation Layer (v3.2.0 — novo) ---
+    #- "arquiteto-de-software"     # Arthur — SOFTWARE + FRONTEND ARCHITECTURE + IMPL_MAP
+    #- "scrum-master"              # Bento — epics + sprint-status + stories auto-contidas
+    #- "desenvolvedor"             # Eduardo — TDD red-green-refactor; NÃO usa Forger
+    #- "qa-de-codigo"              # Iuri — code review pós-Dev em contexto fresco
+
+  # Agentes que serão ativados posteriormente (ainda não implementados)
+  # Opcional: só se Arthur holístico crescer demais (Q2 SPEC Arthur)
+  future:
+    - "arquiteto-de-processos"    # Eixo A: spec_processos.json (BPMN)
+    - "arquiteto-de-documentos"   # Eixo A: spec_documentos.json (YCL-domain)
+    - "arquiteto-de-integracoes"  # Eixo A: spec_integracoes.json (OpenAPI)
+
+skills:
+  # Skills modulares disponíveis em .claude/skills/
+  # Invocadas via /slash-command pelo usuário ou agentes (Task tool)
+  enabled:
+    - "ubiquitous-language-enrichment"  # Adicionar/atualizar termos no glossário
+    - "ubiquitous-language-validation"  # Validação semântica contra glossário
+   # - "forger-resource-api"             # Guia de uso da API Forger (naming, schemas)
+
+workflow:
+  # Workflow inicial (o que fazer ao inicializar projeto)
+  initial_phase: "elicitacao"  # Opções: "elicitacao" | "arquitetura" | "qa" | "deploy"
+
+  # Auto-criar artefatos iniciais
+  auto_create:
+    - "PROJECT.md"
+    - "UBIQUITOUS_LANGUAGE.yaml"
+    - "LEARNING_LOG.md"
+    - "task-status.md"  # Se complexidade == "complexo"
+
+# === Eixo B: Implementation Layer (v3.2.0 — opcional) ===
+# Configuração do pipeline Arthur → Bento → Eduardo → Iuri.
+# Pode ser omitido — defaults sensatos cobrem 95% dos casos.
+implementation:
+  # Backbone do fluxo de implementação (coexiste com task-status.md)
+  sprint_status_file: "artifacts/sprint-status.yaml"
+  stories_dir: "artifacts/stories"
+
+  # Pattern de slug para story files
+  story_slug_pattern: "{epic}-{story}-{kebab-title}"
+
+  # Ferramenta de sharding (capability SD do Bento)
+  sharding_tool: "npx @kayvan/markdown-tree-parser"
+
+  # Se Arthur deve alimentar IMPLEMENTATION_MAP.yaml desde a primeira execução
+  implementation_map_enabled: true
+  implementation_map_file: "IMPLEMENTATION_MAP.yaml"
+
+git:
+  # Configurações de Git
+  auto_init: true  # Criar git repo automaticamente
+  initial_commit: true  # Fazer commit inicial
+  remote_url: ""  # URL do repositório remoto (opcional)
+
+# Metadados do template
+template:
+  version: "3.2.0"
+  source: "/home/julio/Codes/YC/yc-platform-v3/template-project"
+  # description: "Implementation Layer (Arthur/Bento/Eduardo/Iuri) + Dual-Mode PRD + Diagram Designer"
+  description: "Elicitation and Specification Layer + Dual-Mode PRD + Diagram Designer"
+  initialized_at: ""  # Será preenchido pelo script
+  initialized_by: ""  # Será preenchido pelo script

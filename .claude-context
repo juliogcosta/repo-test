@@ -1,0 +1,27 @@
+# Contexto do Projeto (carregado por agentes)
+# Gerado automaticamente pelo init-project.sh
+
+PROJECT_NAME="crm"
+PROJECT_ALIAS="Ycodify CRM - Service"
+CLIENT_NAME="Ycodify"
+PROJECT_ORG="ycodify"
+PROJECT_ROOT="/var/yc/specs/clients/ycodify/client-proj-03-spec"
+COMPLEXITY="medio"
+VALIDATION_MODE="permissive"
+PRD_MODE="monolithic"
+PRD_COMPILE_ON_COMPLETE="false"
+GLOSSARY_PATH="/var/yc/specs/clients/ycodify/client-proj-03-spec/UBIQUITOUS_LANGUAGE.yaml"
+ARTIFACTS_DIR="/var/yc/specs/clients/ycodify/client-proj-03-spec/artifacts"
+SPECS_DIR="/var/yc/specs/clients/ycodify/client-proj-03-spec/specs"
+MCP_AUTHORIZATION="PREENCHER_VIA_ENV"
+MCP_USERNAME="julio"
+MCP_ORG="ycodify"
+
+# Eixo B — Implementation Layer (v3.2.0)
+IMPLEMENTATION_MAP_PATH="/var/yc/specs/clients/ycodify/client-proj-03-spec/IMPLEMENTATION_MAP.yaml"
+SPRINT_STATUS_FILE="/var/yc/specs/clients/ycodify/client-proj-03-spec/artifacts/sprint-status.yaml"
+STORIES_DIR="/var/yc/specs/clients/ycodify/client-proj-03-spec/artifacts/stories"
+TERMINOLOGY_MAP_PATH="/var/yc/specs/clients/ycodify/client-proj-03-spec/claude/TERMINOLOGY_MAP.yaml"
+
+TEMPLATE_VERSION="3.2.0"
+INITIALIZED_AT="2026-04-30"
