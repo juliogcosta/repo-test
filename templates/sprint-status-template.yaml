@@ -1,0 +1,72 @@
+# ==============================================================================
+# sprint-status.yaml
+# ==============================================================================
+# Backbone do eixo de implementação (Bento → Eduardo → Iuri).
+# Mantido por:
+#   - Bento (Scrum Master) — cria via SP; atualiza em CS (backlog → ready-for-dev).
+#   - Eduardo (Dev) — atualiza em IS (ready-for-dev → in-progress → review).
+#   - Iuri (QA-código) — atualiza em RV (review → done OU review → in-progress).
+#
+# Coexiste com `task-status.md` (meta-projeto; controle de alto nível do usuário
+# sobre demandas complexas). Sem conflito: sprint-status.yaml é interno ao eixo
+# de implementação; task-status.md é externo, ortogonal.
+# ==============================================================================
+
+# STATUS DEFINITIONS:
+# ===================
+# Epic Status:
+#   - backlog:         Epic não iniciado (nenhuma story passou de backlog).
+#   - in-progress:     Epic em andamento (alguma story já passou de backlog).
+#   - done:            Todas as stories do epic concluídas.
+#
+# Story Status:
+#   - backlog:         Story definida em epics.md, ainda sem file próprio.
+#   - ready-for-dev:   Story file criado (Bento terminou CS).
+#   - in-progress:     Dev agent trabalhando.
+#   - review:          Dev concluiu DoD; aguardando code-review.
+#   - done:            Code-review aprovado (Iuri).
+#
+# Retrospective Status:
+#   - optional:        Pode ser conduzida a qualquer momento.
+#   - done:            Retrospective concluída.
+# ===================
+
+generated: "{{iso_date}}"
+last_updated: "{{iso_date}}"
+project: "{{project_name}}"
+project_key: "{{project_name}}"
+tracking_system: "file-system"
+story_location: "artifacts/stories"
+
+# ==============================================================================
+# Estado de desenvolvimento
+# ==============================================================================
+# Chaves:
+#   - "epic-N" (apenas) — epic numerado.
+#   - "epic-N-retrospective" — retrospective do epic.
+#   - "N-M-{kebab-slug}" — story N.M.
+#
+# Stories com dependências usam formato expandido:
+#   N-M-{slug}:
+#     status: backlog
+#     depends_on: ["N-K-{slug-outro}"]
+#
+# Stories sem dependências usam formato flat:
+#   N-M-{slug}: backlog
+# ==============================================================================
+
+development_status:
+  # ----------------------------------------------------------------------------
+  # Epic 1: {{epic_1_title}}
+  # ----------------------------------------------------------------------------
+  epic-1: backlog
+  1-1-{{story-slug-1}}: backlog
+  1-2-{{story-slug-2}}: backlog
+  epic-1-retrospective: optional
+
+  # ----------------------------------------------------------------------------
+  # Epic 2: {{epic_2_title}}
+  # ----------------------------------------------------------------------------
+  # epic-2: backlog
+  # 2-1-{{story-slug}}: backlog
+  # epic-2-retrospective: optional

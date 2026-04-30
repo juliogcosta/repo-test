@@ -9,9 +9,9 @@
 # ====================================================================
 
 metadata:
-  project: "crm"  # Ex: licitacoes
+  project: "[nome_do_projeto]"  # Ex: licitacoes
   version: "1.0"
-  last_updated: "2026-04-30"
+  last_updated: "YYYY-MM-DD"
   maintainer: "Guardião de Linguagem Ubíqua"
   bounded_contexts:
     - "[bc1]"  # Ex: licitacao
@@ -33,7 +33,7 @@ global_terms:
     examples:
       - "[Exemplo de uso correto do termo]"
     notes: "[Observações adicionais, contexto histórico, etc]"
-    added_date: "2026-04-30"
+    added_date: "YYYY-MM-DD"
     added_by: "[Nome do agente ou pessoa]"
 
   # EXEMPLO CONCRETO:
@@ -158,7 +158,7 @@ ambiguous_terms:
     occurrences:
       - context: "[Onde foi usado]"
         meaning: "[Significado inferido]"
-        timestamp: "2026-04-30THH:MM:SS"
+        timestamp: "YYYY-MM-DDTHH:MM:SS"
         agent: "[Quem usou]"
     resolution_status: "pending | resolved | wont-fix"
     resolution_notes: "[Como foi resolvido, se aplicável]"
@@ -186,7 +186,7 @@ ambiguous_terms:
 semantic_drift_log:
   - term: "[Termo]"
     drift_type: "[meaning-shift | scope-creep | synonym-introduction]"
-    detected_at: "2026-04-30THH:MM:SS"
+    detected_at: "YYYY-MM-DDTHH:MM:SS"
     description: "[Descrição do drift]"
     glossary_definition: "[Definição no glossário]"
     observed_usage: "[Como estava sendo usado]"
@@ -270,7 +270,7 @@ validation_rules:
 
 changelog:
   - version: "1.0"
-    date: "2026-04-30"
+    date: "YYYY-MM-DD"
     author: "[Nome]"
     changes: "Versão inicial do glossário"
     terms_added: []
@@ -304,7 +304,7 @@ statistics:
   total_ambiguous_terms: 0
   total_drift_incidents: 0
   conformity_rate: 0.00  # % de termos usados que estão no glossário
-  last_drift_check: "2026-04-30THH:MM:SS"
+  last_drift_check: "YYYY-MM-DDTHH:MM:SS"
   most_violated_rule: "[VR-XXX]"
 
 # ==============================================================================

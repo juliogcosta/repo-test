@@ -1,0 +1,295 @@
+# ==============================================================================
+# IMPLEMENTATION_MAP.yaml
+# ==============================================================================
+# Mapa hierárquico business_term → design_term → implementation_artifact.
+#
+# Propósito:
+#   - Traduzir termos de negócio (UBIQUITOUS_LANGUAGE.yaml) e conceitos de
+#     design (claude/TERMINOLOGY_MAP.yaml) para artefatos concretos de
+#     implementação (files, classes, modules, tests, endpoints).
+#   - Prover rastreabilidade end-to-end: requisito (PRD/ANEXO) →
+#     conceito de arquitetura (SOFTWARE_ARCHITECTURE) → arquivo no repo.
+#
+# Alimentação:
+#   - Arquiteto de Software (Arthur) — capabilities CA (criação inicial) e
+#     AM (atualização cirúrgica). Ver claude/agents/arquiteto-de-software-*.
+#
+# Consumo:
+#   - Scrum Master (Bento) — capability CS: lê para gerar Dev Notes em
+#     stories. Se business_term referenciado na story não existe aqui,
+#     SM executa HALT e aciona Arthur (capability AM) para adicionar entry.
+#   - QA de Código (Iuri): lê para validar architecture compliance do PR.
+#   - Guardião de Linguagem (Lexicon): consulta como referência cruzada.
+#
+# Referência cruzada (arquivos relacionados):
+#   - UBIQUITOUS_LANGUAGE.yaml (raiz)        — glossário business-canônico.
+#   - claude/TERMINOLOGY_MAP.yaml            — business ↔ design-conceitual.
+#   - artifacts/SOFTWARE_ARCHITECTURE.md     — fonte dos artefatos backend.
+#   - artifacts/FRONTEND_ARCHITECTURE.md     — fonte dos artefatos frontend.
+#   - artifacts/PRD.md + ANEXO_A/B/C.md      — fonte dos requisitos.
+#
+# Versionamento (SemVer):
+#   - MAJOR: remoção ou renomeação de categoria; breaking schema change.
+#   - MINOR: adição de nova categoria OU nova entry em categoria existente.
+#   - PATCH: atualização de paths, cross_refs, public_api em entry existente.
+#   - Changelog obrigatório em meta.changelog a cada bump.
+#
+# Regra de ouro:
+#   - Dev NUNCA modifica este arquivo. Somente Arquiteto escreve.
+#   - Se Dev detecta inconsistência, aciona SM que aciona Arquiteto (AM).
+# ==============================================================================
+
+meta:
+  version: "1.0.0"
+  project: "{{project_name}}"
+  last_updated: "{{iso_date}}"
+  maintained_by: "arquiteto-de-software"
+  schema_version: "1.0"
+  related_files:
+    ubiquitous_language: "UBIQUITOUS_LANGUAGE.yaml"
+    terminology_map: "claude/TERMINOLOGY_MAP.yaml"
+    software_architecture: "artifacts/SOFTWARE_ARCHITECTURE.md"
+    frontend_architecture: "artifacts/FRONTEND_ARCHITECTURE.md"
+    prd: "artifacts/PRD.md"
+    anexo_a: "artifacts/ANEXO_A_ProcessDetails.md"
+    anexo_b: "artifacts/ANEXO_B_DataModels.md"
+    anexo_c: "artifacts/ANEXO_C_Integrations.md"
+  changelog:
+    - version: "1.0.0"
+      date: "{{iso_date}}"
+      author: "arquiteto-de-software"
+      note: "Criação inicial a partir de PRD + ANEXOS + SOFTWARE_ARCHITECTURE."
+
+# ==============================================================================
+# ESTRUTURA HIERÁRQUICA POR CATEGORIA
+# ==============================================================================
+# Preencher cada categoria com entries reais do projeto substituindo o
+# exemplo-stub. Exemplos foram deixados minimais intencionalmente — são
+# placeholders de estrutura, não de conteúdo.
+# ==============================================================================
+
+categories:
+
+  # ----------------------------------------------------------------------------
+  # 1. DOMAIN_ENTITIES
+  # ----------------------------------------------------------------------------
+  # Aggregates, entidades e value objects de domínio (DDD).
+  # Fonte: ANEXO_B + SOFTWARE_ARCHITECTURE §4 Components.
+  # ----------------------------------------------------------------------------
+  domain_entities:
+    description: "Aggregates e entidades de domínio."
+    entries:
+      # Exemplo — substituir pela realidade do projeto
+      - business_term: "[Termo de Negócio]"
+        design_term: "[DOC-xxx-NomeAggregate]"
+        implementation:
+          module: "src/modules/[contexto]/domain/[entidade]"
+          files:
+            - "src/modules/[contexto]/domain/[entidade]/[Entidade].ts"
+            - "src/modules/[contexto]/domain/[entidade]/[Entidade]Invariants.ts"
+          tests:
+            - "src/modules/[contexto]/domain/[entidade]/__tests__/[Entidade].spec.ts"
+          public_api:
+            - "[ClasseOuFuncaoExposta]"
+        cross_refs:
+          ubiquitous_language: "[Termo de Negócio]"
+          terminology_map: "[DOC-xxx-NomeAggregate]"
+          prd_section: "PRD §8 FR-xxx"
+          anexo_b_section: "ANEXO_B §x.y"
+          architecture_section: "SOFTWARE_ARCHITECTURE §4 Components"
+
+  # ----------------------------------------------------------------------------
+  # 2. BUSINESS_PROCESSES
+  # ----------------------------------------------------------------------------
+  # Processos de negócio orquestrados (sagas, workflows, use cases).
+  # Fonte: ANEXO_A + SOFTWARE_ARCHITECTURE §5 Core Workflows.
+  # ----------------------------------------------------------------------------
+  business_processes:
+    description: "Processos de negócio orquestrados (sagas, workflows, use cases)."
+    entries:
+      # Exemplo — substituir pela realidade do projeto
+      - business_term: "[Nome do Processo]"
+        design_term: "[PROC-xxx-NomeProcesso]"
+        implementation:
+          module: "src/modules/[contexto]/application/[processo]"
+          files:
+            - "src/modules/[contexto]/application/[processo]/[Processo]Saga.ts"
+          tests:
+            - "src/modules/[contexto]/application/[processo]/__tests__/[Processo].spec.ts"
+          public_api:
+            - "[ProcessoSaga].execute()"
+          dependencies:
+            - "domain_entities.[TermoDeNegocio]"
+        cross_refs:
+          ubiquitous_language: "[Nome do Processo]"
+          anexo_a_section: "ANEXO_A §x.y Processo P-xxx"
+          architecture_section: "SOFTWARE_ARCHITECTURE §5 Core Workflows"
+
+  # ----------------------------------------------------------------------------
+  # 3. INTEGRATIONS
+  # ----------------------------------------------------------------------------
+  # Integrações externas (APIs, brokers, jobs).
+  # Fonte: ANEXO_C + SOFTWARE_ARCHITECTURE §10 Error Handling Strategy.
+  # ----------------------------------------------------------------------------
+  integrations:
+    description: "Integrações externas (APIs, brokers, jobs)."
+    entries:
+      # Exemplo — substituir pela realidade do projeto
+      - business_term: "[Nome da Integração Externa]"
+        design_term: "[external_service_client]"
+        implementation:
+          module: "src/infrastructure/clients/[servico]"
+          files:
+            - "src/infrastructure/clients/[servico]/[Servico]Client.ts"
+            - "src/infrastructure/clients/[servico]/[Servico]Contract.ts"
+          tests:
+            - "src/infrastructure/clients/[servico]/__tests__/[Servico]Client.spec.ts"
+          endpoints_consumed:
+            - "GET /path/to/endpoint"
+          resilience:
+            circuit_breaker: "N failures / M seconds"
+            timeout: "Xs"
+            retries: "N exponential"
+        cross_refs:
+          anexo_c_section: "ANEXO_C §x.y Integração I-xxx"
+
+  # ----------------------------------------------------------------------------
+  # 4. DATA_MODELS
+  # ----------------------------------------------------------------------------
+  # Modelos de dados persistidos (tabelas, coleções, migrations).
+  # Fonte: ANEXO_B + SOFTWARE_ARCHITECTURE §7 Database Schema.
+  # ----------------------------------------------------------------------------
+  data_models:
+    description: "Modelos de dados persistidos (tabelas, coleções, migrations)."
+    entries:
+      # Exemplo — substituir pela realidade do projeto
+      - business_term: "[Termo de Negócio]"
+        design_term: "[nome_tabela]"
+        implementation:
+          schema: "[nome_tabela]"
+          migration: "backend/migrations/YYYYMMDD_NNN_create_[nome_tabela].sql"
+          orm_model: "src/infrastructure/persistence/[NomeTabela]Model.ts"
+          indexes:
+            - "idx_[tabela]_[coluna]"
+        cross_refs:
+          anexo_b_section: "ANEXO_B §x.y Entidade [Nome]"
+          architecture_section: "SOFTWARE_ARCHITECTURE §7 Database Schema"
+
+  # ----------------------------------------------------------------------------
+  # 5. UI_COMPONENTS
+  # ----------------------------------------------------------------------------
+  # Componentes de UI (telas, formulários, widgets).
+  # Fonte: PRD §4 Jornadas + FRONTEND_ARCHITECTURE §4 Component Standards.
+  # Esta categoria permanece vazia se projeto não tem UI.
+  # ----------------------------------------------------------------------------
+  ui_components:
+    description: "Componentes de UI (telas, formulários, widgets)."
+    entries:
+      # Exemplo — substituir pela realidade do projeto (ou remover se sem UI)
+      - business_term: "[Jornada do Usuário]"
+        design_term: "[NomeComponent]"
+        implementation:
+          module: "frontend/src/features/[feature]"
+          files:
+            - "frontend/src/features/[feature]/[NomeComponent].tsx"
+            - "frontend/src/features/[feature]/use[NomeComponent].hook.ts"
+          tests:
+            - "frontend/src/features/[feature]/__tests__/[NomeComponent].spec.tsx"
+          state_slice: "[featureSlice]"
+        cross_refs:
+          prd_section: "PRD §4 Jornada J-xx"
+          frontend_architecture_section: "FRONTEND_ARCHITECTURE §4 Component Standards"
+
+  # ----------------------------------------------------------------------------
+  # 6. INFRASTRUCTURE
+  # ----------------------------------------------------------------------------
+  # Recursos de infraestrutura (IaC, containers, networking).
+  # Fonte: SOFTWARE_ARCHITECTURE §11 Infrastructure and Deployment.
+  # ----------------------------------------------------------------------------
+  infrastructure:
+    description: "Recursos de infraestrutura (IaC, containers, networking)."
+    entries:
+      # Exemplo — substituir pela realidade do projeto
+      - business_term: "[Recurso de Infra — ex. 'Banco de dados principal']"
+        design_term: "[nome-recurso-env]"
+        implementation:
+          iac_file: "infra/terraform/modules/[tipo]/[recurso].tf"
+          resource_type: "[tipo_provider_recurso]"
+          naming: "[nome]-${var.env}"
+        cross_refs:
+          architecture_section: "SOFTWARE_ARCHITECTURE §11 Infrastructure"
+
+  # ----------------------------------------------------------------------------
+  # 7. DOMAIN_EVENTS
+  # ----------------------------------------------------------------------------
+  # Eventos de domínio emitidos → handlers/subscribers.
+  # Fonte: ANEXO_B (eventos) + SOFTWARE_ARCHITECTURE §4/§5.
+  # ----------------------------------------------------------------------------
+  domain_events:
+    description: "Eventos de domínio emitidos → handlers/subscribers."
+    entries:
+      # Exemplo — substituir pela realidade do projeto
+      - business_term: "[Evento de Negócio]"
+        design_term: "[NomeEvento]Event"
+        implementation:
+          emit_at:
+            - "src/modules/[contexto]/domain/[entidade]/[Entidade].ts:[método]()"
+          handlers:
+            - "src/modules/[contexto]/application/[handler]/[Handler].ts"
+          broker_topic: "[contexto].[evento].v1"
+        cross_refs:
+          ubiquitous_language: "[Evento de Negócio]"
+          anexo_b_section: "ANEXO_B §x.y"
+
+# ==============================================================================
+# REGRAS DE MANUTENÇÃO (IM-R001 … IM-R008)
+# ==============================================================================
+rules:
+  - id: "IM-R001"
+    text: "Toda entry DEVE ter pelo menos 1 cross_ref para UBIQUITOUS_LANGUAGE OU TERMINOLOGY_MAP."
+  - id: "IM-R002"
+    text: "business_term DEVE existir no UBIQUITOUS_LANGUAGE.yaml. Se não existir, primeiro enriquecer o glossário via Lexicon."
+  - id: "IM-R003"
+    text: "design_term DEVE existir no TERMINOLOGY_MAP.yaml (categoria equivalente). Se não existir, Arquiteto consulta Lexicon para registrar."
+  - id: "IM-R004"
+    text: "Paths DEVEM ser relativos à raiz do projeto; absolutos NUNCA."
+  - id: "IM-R005"
+    text: "Dev NUNCA modifica este arquivo. Somente Arquiteto escreve (capabilities CA e AM). Enforcement sugerido: CODEOWNERS."
+  - id: "IM-R006"
+    text: "Arquiteto atualiza via AM quando ANEXO muda, arquitetura é refinada, ou downstream (SM/Dev/QA) escala HALT."
+  - id: "IM-R007"
+    text: "SM consulta via leitura. Em caso de gap (business_term sem entry correspondente), HALT e aciona Arquiteto (AM)."
+  - id: "IM-R008"
+    text: "Toda mudança requer bump SemVer + entry em meta.changelog. Mudança sem changelog é inaceitável."
+
+# ==============================================================================
+# ÍNDICE REVERSO (opcional, auto-gerável no futuro)
+# ==============================================================================
+# Quando projeto amadurecer, gerar este bloco automaticamente via script
+# para acelerar lookup "qual business_term está em `src/foo/Bar.ts`".
+# ==============================================================================
+# reverse_index:
+#   by_file:
+#     "src/modules/[contexto]/domain/[Entidade].ts":
+#       - category: domain_entities
+#         business_term: "[Termo de Negócio]"
+
+# ==============================================================================
+# ENFORCEMENT E INTEGRAÇÃO
+# ==============================================================================
+# 1) Triggers para Arquiteto acionar Lexicon (capability AM):
+#    - business_term novo não encontrado em UBIQUITOUS_LANGUAGE.yaml.
+#    - design_term novo não encontrado em TERMINOLOGY_MAP.yaml.
+#    - Convenção de naming técnico divergente do TERMINOLOGY_MAP.
+#    - Ambiguidade entre business_term existente e novo (sinônimo?).
+#
+# 2) Casos em que Arquiteto NÃO precisa acionar Lexicon:
+#    - Ajuste de path (refactor) de entry cujo business_term já está ancorado.
+#    - Adição de test_file ou handler a entry existente.
+#    - Bump de versão de dependência declarada em public_api (se naming igual).
+#
+# 3) Política SemVer — exemplos:
+#    - v1.0.0 → v1.0.1 (PATCH): "Corrigir path de OrderModel após mover pasta".
+#    - v1.0.1 → v1.1.0 (MINOR): "Adicionar nova entry Impugnacao em domain_entities".
+#    - v1.1.0 → v2.0.0 (MAJOR): "Introduzir categoria 'cross_cutting' (breaking)".
+# ==============================================================================

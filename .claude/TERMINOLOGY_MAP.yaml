@@ -1,0 +1,315 @@
+---
+version: "1.1"
+description: "Mapeamento bidirecional entre terminologia de negócio (usada com clientes) e terminologia técnica conceitual (usada internamente por Arquitetos). Usado pelo Guardião de Linguagem Ubíqua, Analista de Negócio e QA de Specs."
+last_updated: "2026-04-19"
+
+# === Arquivos Relacionados (v3.2.0 — Eixo B Implementation Layer) ===
+# Este arquivo cobre: business_term ↔ design_term (nível CONCEITUAL).
+# Para mapear design_term ↔ implementation_artifact (arquivo/classe/módulo
+# concreto de código), consultar IMPLEMENTATION_MAP.yaml na raiz do projeto.
+#
+# Ver:
+#   - IMPLEMENTATION_MAP.yaml        (raiz do projeto — design ↔ código)
+#   - UBIQUITOUS_LANGUAGE.yaml       (raiz — glossário business-canônico)
+#   - claude/agents/arquiteto-de-software-* (Arthur — alimenta IMPL_MAP)
+#   - claude/agents/guardiao-linguagem-ubiqua.md (Lexicon — valida termos)
+# =====================================================================
+---
+
+# Terminology Map — Negócio ↔ Técnico (Conceitual)
+
+## Instruções de Uso
+
+### Para Orquestrador e Analista de Negócio
+- **SEMPRE use termos da coluna `business_term`** ao falar com cliente
+- **NUNCA exponha termos da coluna `technical_term`** ao cliente
+- Use `context_hint` para esclarecer ambiguidades
+
+### Para Arquitetos (Documentos e Processos)
+- **Leia termos de negócio** da ESPECIFICACAO_NEGOCIO.md
+- **Traduza para termos técnicos** usando este mapa
+- **Documente mapeamento** em metadados (Seção 8 da ESPECIFICACAO_NEGOCIO.md)
+
+### Para Guardião de Linguagem Ubíqua
+- **Valide tradução bidirecional**: Garanta que termos de negócio sejam consistentemente mapeados
+- **Detecte novos termos**: Se cliente usar termo não mapeado, sugira adição ao mapa
+- **Enforce consistência**: Mesma entidade de negócio → mesmo ID técnico em todas as specs
+
+### Para QA de Specs
+- **Use para rastreabilidade semântica**: Validar que termo de negócio "X" foi traduzido para termo técnico "Y"
+- **Detecte conflitos**: Se QA encontrar múltiplos mapeamentos, sinalizar inconsistência
+
+---
+
+## Mapeamento: Negócio → Técnico
+
+```yaml
+# ==========================================
+# CATEGORIA: Estruturas de Domínio
+# ==========================================
+
+- business_term: "Módulo de Negócio"
+  technical_term: "Bounded Context"
+  category: "estrutura_dominio"
+  context_hint: "Agrupamento de processos e documentos relacionados (ex: 'Licitações', 'Vendas')"
+  examples:
+    - business: "Módulo de Licitações"
+      technical: "bounded_context: licitacao"
+    - business: "Módulo de Vendas"
+      technical: "bounded_context: vendas"
+
+- business_term: "Documento Principal"
+  technical_term: "Aggregate Root"
+  category: "estrutura_dominio"
+  context_hint: "Entidade principal que agrupa dados relacionados (ex: 'Proposta', 'Pedido')"
+  examples:
+    - business: "Documento: Proposta de Licitação"
+      technical: "aggregate: Proposta"
+
+- business_term: "Documento Auxiliar"
+  technical_term: "Entity"
+  category: "estrutura_dominio"
+  context_hint: "Entidade que pertence a um documento principal mas tem identidade própria"
+  examples:
+    - business: "Item de Proposta"
+      technical: "entity: ItemProposta (dentro do aggregate Proposta)"
+
+- business_term: "Valor/Dado Simples"
+  technical_term: "Value Object"
+  category: "estrutura_dominio"
+  context_hint: "Dado sem identidade própria (ex: CPF, endereço, moeda)"
+  examples:
+    - business: "CPF do cliente"
+      technical: "value_object: CPF"
+    - business: "Endereço de entrega"
+      technical: "value_object: Endereco"
+
+# ==========================================
+# CATEGORIA: Regras de Negócio
+# ==========================================
+
+- business_term: "Regra de Negócio Obrigatória"
+  technical_term: "Invariant"
+  category: "regra_negocio"
+  context_hint: "Regra que SEMPRE deve ser verdadeira para um documento (ex: 'Valor > 0')"
+  examples:
+    - business: "Proposta não pode ser editada após homologação"
+      technical: "invariant: proposta_imutavel_pos_homologacao"
+    - business: "Valor da proposta deve ser maior que zero"
+      technical: "invariant: valor_proposta_positivo"
+
+- business_term: "Validação de Campo"
+  technical_term: "Field Validation"
+  category: "regra_negocio"
+  context_hint: "Regra de formato/range para um campo específico"
+  examples:
+    - business: "CPF deve ter 11 dígitos"
+      technical: "field_validation: cpf_formato"
+    - business: "Data de entrega deve ser futura"
+      technical: "field_validation: data_entrega_futura"
+
+- business_term: "Restrição de Processo"
+  technical_term: "Process Constraint"
+  category: "regra_negocio"
+  context_hint: "Condição que controla execução de um processo (ex: 'Aprovação requer 2 assinaturas')"
+  examples:
+    - business: "Aprovação requer duas assinaturas"
+      technical: "process_constraint: aprovacao_dupla_assinatura"
+
+# ==========================================
+# CATEGORIA: Processos e Fluxos
+# ==========================================
+
+- business_term: "Processo de Negócio"
+  technical_term: "BPMN Process"
+  category: "processo"
+  context_hint: "Fluxo de trabalho completo (ex: 'Abertura de Licitação')"
+  examples:
+    - business: "Processo: Abertura de Licitação"
+      technical: "bpmn_process: abertura_licitacao"
+
+- business_term: "Etapa do Processo"
+  technical_term: "BPMN Task"
+  category: "processo"
+  context_hint: "Atividade dentro de um processo (ex: 'Validar Documentação')"
+  examples:
+    - business: "Etapa: Validar Documentação"
+      technical: "bpmn_task: validar_documentacao"
+
+- business_term: "Decisão/Ponto de Escolha"
+  technical_term: "BPMN Gateway (Exclusive)"
+  category: "processo"
+  context_hint: "Ponto onde processo toma decisão (ex: 'Aprovado ou Rejeitado?')"
+  examples:
+    - business: "Decisão: Proposta aprovada?"
+      technical: "bpmn_gateway: proposta_aprovada_gateway"
+
+- business_term: "Atividades Paralelas"
+  technical_term: "BPMN Gateway (Parallel)"
+  category: "processo"
+  context_hint: "Múltiplas etapas executadas simultaneamente"
+  examples:
+    - business: "Enviar notificação E Gerar contrato (em paralelo)"
+      technical: "bpmn_parallel_gateway: notificar_e_gerar_contrato"
+
+- business_term: "Evento de Negócio"
+  technical_term: "Domain Event"
+  category: "processo"
+  context_hint: "Algo que aconteceu no negócio e deve ser registrado (ex: 'Proposta Enviada')"
+  examples:
+    - business: "Evento: Proposta foi enviada"
+      technical: "domain_event: PropostaEnviada"
+    - business: "Evento: Licitação foi homologada"
+      technical: "domain_event: LicitacaoHomologada"
+
+- business_term: "Ação/Operação"
+  technical_term: "Command"
+  category: "processo"
+  context_hint: "Intenção de mudar estado do sistema (ex: 'Enviar Proposta')"
+  examples:
+    - business: "Ação: Enviar Proposta"
+      technical: "command: EnviarProposta"
+    - business: "Ação: Aprovar Licitação"
+      technical: "command: AprovarLicitacao"
+
+# ==========================================
+# CATEGORIA: Papéis e Responsabilidades
+# ==========================================
+
+- business_term: "Papel/Responsável"
+  technical_term: "Actor / Swimlane"
+  category: "responsabilidade"
+  context_hint: "Pessoa ou sistema responsável por executar etapa (ex: 'Gerente de Compras')"
+  examples:
+    - business: "Responsável: Gerente de Compras"
+      technical: "actor: gerente_compras (swimlane em BPMN)"
+    - business: "Responsável: Sistema de Notificações"
+      technical: "actor: sistema_notificacoes"
+
+# ==========================================
+# CATEGORIA: Integrações e Fontes de Dados
+# ==========================================
+
+- business_term: "Sistema Externo/Integração"
+  technical_term: "External System / Anti-Corruption Layer"
+  category: "integracao"
+  context_hint: "Sistema que fornece dados ou serviços (ex: 'API de Consulta de CPF')"
+  examples:
+    - business: "Integração: API Receita Federal (consultar CPF)"
+      technical: "external_system: receita_federal_api"
+
+- business_term: "Fonte de Dados"
+  technical_term: "Data Source / Repository"
+  category: "integracao"
+  context_hint: "Origem dos dados (ex: 'Banco de dados legado', 'Planilha Excel')"
+  examples:
+    - business: "Fonte: Sistema legado de cadastro"
+      technical: "data_source: legado_cadastro_db"
+
+# ==========================================
+# CATEGORIA: Especificações e Artefatos
+# ==========================================
+
+- business_term: "Especificação de Processos"
+  technical_term: "BPMN Spec / spec_processos.json"
+  category: "artefato"
+  context_hint: "Arquivo técnico com processos em formato BPMN 2.0"
+  examples:
+    - business: "Especificação de Processos"
+      technical: "specs/spec_processos.json"
+
+- business_term: "Especificação de Documentos/Dados"
+  technical_term: "DDD Spec / YCL-domain / spec_documentos.json"
+  category: "artefato"
+  context_hint: "Arquivo técnico com documentos/domínio em formato YCL-domain da Ycodify"
+  examples:
+    - business: "Especificação de Documentos"
+      technical: "specs/spec_documentos.json (formato YCL-domain)"
+
+- business_term: "Especificação de Negócio"
+  technical_term: "Business Requirements / ESPECIFICACAO_NEGOCIO.md"
+  category: "artefato"
+  context_hint: "Documento em linguagem natural descrevendo requisitos de negócio"
+  examples:
+    - business: "Especificação de Negócio"
+      technical: "ESPECIFICACAO_NEGOCIO.md"
+
+# ==========================================
+# CATEGORIA: Relacionamentos e Estrutura
+# ==========================================
+
+- business_term: "Relacionamento 1:1"
+  technical_term: "One-to-One Association"
+  category: "relacionamento"
+  context_hint: "Um documento se relaciona com exatamente um outro (ex: 'Pedido ↔ Fatura')"
+  examples:
+    - business: "Cada Pedido tem exatamente uma Fatura"
+      technical: "association: Pedido 1:1 Fatura"
+
+- business_term: "Relacionamento 1:N"
+  technical_term: "One-to-Many Association"
+  category: "relacionamento"
+  context_hint: "Um documento se relaciona com vários outros (ex: 'Pedido → Itens')"
+  examples:
+    - business: "Um Pedido tem vários Itens"
+      technical: "association: Pedido 1:N ItemPedido"
+
+- business_term: "Relacionamento N:N"
+  technical_term: "Many-to-Many Association"
+  category: "relacionamento"
+  context_hint: "Múltiplos documentos se relacionam mutuamente (ex: 'Produtos ↔ Categorias')"
+  examples:
+    - business: "Produtos podem estar em várias Categorias"
+      technical: "association: Produto N:N Categoria"
+```
+
+---
+
+## Mapeamento Reverso: Técnico → Negócio
+
+Este mapeamento é gerado automaticamente invertendo o mapeamento acima.
+Usado quando Arquiteto gera specs técnicas e precisa referenciar termo de negócio original.
+
+**Regra**: Se você vê `bounded_context: licitacao` → deve rastrear para "Módulo de Licitações" na ESPECIFICACAO_NEGOCIO.md
+
+---
+
+## Como Adicionar Novos Termos
+
+Quando cliente usa termo de negócio NÃO mapeado:
+
+1. **Guardião detecta**: "Cliente usou termo 'Fluxo de Aprovação Multinível' — não está no TERMINOLOGY_MAP"
+2. **Guardião sugere mapeamento**: "Isso parece ser um 'Processo de Negócio' (BPMN Process). Confirma?"
+3. **Cliente confirma**: Guardião adiciona entrada ao TERMINOLOGY_MAP.yaml
+4. **Versionamento**: Incrementar version, atualizar last_updated
+
+---
+
+## Convenções de Naming Técnico
+
+Para garantir consistência, IDs técnicos seguem padrões:
+
+```yaml
+naming_conventions:
+  bounded_context_id: "^[a-z_]+$"  # ex: licitacao, vendas, gestao_contratos
+  aggregate_id: "^[A-Z][a-zA-Z]+$"  # ex: Proposta, Pedido, Cliente
+  entity_id: "^[A-Z][a-zA-Z]+$"  # ex: ItemProposta, EnderecoEntrega
+  value_object_id: "^[A-Z][a-zA-Z]+$"  # ex: CPF, Email, Moeda
+  command_id: "^[A-Z][a-zA-Z]+$"  # ex: EnviarProposta, AprovarPedido
+  event_id: "^[A-Z][a-zA-Z]+$"  # ex: PropostaEnviada, PedidoAprovado
+  invariant_id: "^[a-z_]+$"  # ex: proposta_imutavel_pos_homologacao
+  process_id: "^[a-z_]+$"  # ex: abertura_licitacao, aprovacao_pedido
+  task_id: "^[a-z_]+$"  # ex: validar_documentacao, enviar_notificacao
+```
+
+**Normalização**:
+- "Módulo de Licitações" → `licitacao` (remove espaços, acentos, lowercase)
+- "Proposta de Licitação" → `Proposta` (remove preposições, CamelCase para aggregates)
+- "Enviar Proposta" → `EnviarProposta` (command em CamelCase)
+- "Proposta foi enviada" → `PropostaEnviada` (event em CamelCase, tempo passado)
+
+---
+
+**Versão**: 1.0
+**Data**: 2026-04-15
+**Mantido por**: Guardião de Linguagem Ubíqua + Orquestrador

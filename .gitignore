@@ -1,0 +1,20 @@
+# Credentials e secrets
+*.env
+*credentials.json
+*secret*.yaml
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporários
+*.tmp
+*.bak

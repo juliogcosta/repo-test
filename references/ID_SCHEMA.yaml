@@ -1,0 +1,240 @@
+# ID Schema - Formato obrigatório para todos os IDs de rastreabilidade
+# Este arquivo define os padrões de ID usados para rastreabilidade de requisitos
+# em documentos de elicitação (PRD + ANEXOS) e especificação técnica.
+
+metadata:
+  version: "1.0"
+  description: "Schema de IDs para rastreabilidade de requisitos na YC Platform"
+  last_updated: "2026-04-17"
+  scope: "Documentação apenas (elicitação + especificação), NÃO código"
+
+# Padrões de ID para cada tipo de artefato
+
+id_patterns:
+  user_journey:
+    pattern: "^UJ-[0-9]{2}-[0-9]{3}$"
+    description: "User Journey ID - Jornadas de usuário no PRD Seção 4"
+    format: "UJ-{section}-{sequence}"
+    examples:
+      - "UJ-04-001"
+      - "UJ-04-002"
+      - "UJ-04-015"
+    component_rules:
+      section: "Sempre '04' (Seção 4 do PRD onde Journeys estão documentados)"
+      sequence: "Sequencial de 001 a 999, sem reutilização após remoção"
+    regex_explanation: "UJ- seguido de 2 dígitos (seção) e 3 dígitos (sequência)"
+
+  functional_requirement:
+    pattern: "^FR-[0-9]{3}$"
+    description: "Functional Requirement ID - Requisitos funcionais no PRD Seção 8"
+    format: "FR-{sequence}"
+    examples:
+      - "FR-001"
+      - "FR-050"
+      - "FR-123"
+    component_rules:
+      sequence: "Sequencial de 001 a 999, sem reutilização após remoção"
+    regex_explanation: "FR- seguido de 3 dígitos (sequência)"
+
+  invariant:
+    pattern: "^INV-[0-9]{3}$"
+    description: "Business Invariant ID - Invariantes de negócio no ANEXO B"
+    format: "INV-{sequence}"
+    examples:
+      - "INV-001"
+      - "INV-042"
+      - "INV-100"
+    component_rules:
+      sequence: "Sequencial de 001 a 999, sem reutilização após remoção"
+    regex_explanation: "INV- seguido de 3 dígitos (sequência)"
+    notes: "Invariantes são regras de negócio que devem sempre ser verdadeiras"
+
+  success_criteria:
+    pattern: "^SC-[A-Z]{3}-[0-9]{3}$"
+    description: "Success Criteria ID - Critérios de sucesso no PRD Seção 3"
+    format: "SC-{category}-{sequence}"
+    examples:
+      - "SC-BIZ-001"   # Business criteria
+      - "SC-TEC-001"   # Technical criteria
+      - "SC-UX-001"    # UX criteria
+      - "SC-SEC-001"   # Security criteria
+      - "SC-PERF-001"  # Performance criteria
+    component_rules:
+      category: "Enum: BIZ (Business) | TEC (Technical) | UX (User Experience) | SEC (Security) | PERF (Performance)"
+      sequence: "Sequencial de 001 a 999 DENTRO de cada categoria"
+    regex_explanation: "SC- seguido de 3 letras maiúsculas (categoria) e 3 dígitos (sequência)"
+
+  process:
+    pattern: "^PROC-[a-z]+-[0-9]{3}$"
+    description: "Business Process ID - Processos de negócio no ANEXO A"
+    format: "PROC-{bc_id}-{sequence}"
+    examples:
+      - "PROC-lic-001"      # Processo 001 no BC licitacao
+      - "PROC-prop-005"     # Processo 005 no BC proposta
+      - "PROC-contrato-012" # Processo 012 no BC contrato
+    component_rules:
+      bc_id: "Identificador do Bounded Context (normalizado: ^[a-z]+$, sem acentos/espaços)"
+      sequence: "Sequencial de 001 a 999 DENTRO de cada BC"
+    regex_explanation: "PROC- seguido de bc_id (lowercase letters) e 3 dígitos (sequência)"
+    notes: "bc_id deve seguir naming convention Forger (^[a-z]+$)"
+
+  document:
+    pattern: "^DOC-[a-z]+-[A-Z][a-z]+$"
+    description: "Document/Aggregate ID - Documentos/Aggregates no ANEXO B"
+    format: "DOC-{bc_id}-{TechnicalName}"
+    examples:
+      - "DOC-lic-Edital"
+      - "DOC-prop-Proposta"
+      - "DOC-contrato-Contrato"
+    component_rules:
+      bc_id: "Identificador do Bounded Context (normalizado: ^[a-z]+$, sem acentos/espaços)"
+      TechnicalName: "Nome técnico do documento em PascalCase (usado no YCL-domain spec)"
+    regex_explanation: "DOC- seguido de bc_id (lowercase) e TechnicalName (PascalCase)"
+    notes: "TechnicalName deve corresponder exatamente ao nome no spec_documentos.json"
+
+  vision_item:
+    pattern: "^VIS-[0-9]{2}-[0-9]{3}$"
+    description: "Vision Item ID - Itens de visão estratégica no PRD Seção 2"
+    format: "VIS-{section}-{sequence}"
+    examples:
+      - "VIS-02-001"
+      - "VIS-02-005"
+    component_rules:
+      section: "Sempre '02' (Seção 2 do PRD onde Objectives estão documentados)"
+      sequence: "Sequencial de 001 a 999"
+    regex_explanation: "VIS- seguido de 2 dígitos (seção) e 3 dígitos (sequência)"
+    notes: "Opcional: usado para rastreabilidade de objetivos estratégicos → Journeys"
+
+# Regras de validação obrigatórias
+
+validation_rules:
+  - rule_id: "VR-ID-001"
+    description: "Todos os IDs devem ser únicos no escopo do projeto"
+    severity: "CRITICAL"
+    validation_type: "uniqueness"
+    enforced_by: "scripts/validate-ids.sh"
+
+  - rule_id: "VR-ID-002"
+    description: "IDs não podem ser reutilizados após remoção de requisito (usar próximo sequencial)"
+    severity: "HIGH"
+    validation_type: "immutability"
+    enforced_by: "manual review + changelog"
+    notes: "Evita ambiguidade em histórico Git e rastreabilidade temporal"
+
+  - rule_id: "VR-ID-003"
+    description: "Links devem referenciar IDs existentes (sem orphans)"
+    severity: "CRITICAL"
+    validation_type: "referential_integrity"
+    enforced_by: "scripts/validate-links.sh"
+
+  - rule_id: "VR-ID-004"
+    description: "IDs devem seguir exatamente o pattern (case-sensitive)"
+    severity: "HIGH"
+    validation_type: "format"
+    enforced_by: "scripts/validate-ids.sh"
+
+  - rule_id: "VR-ID-005"
+    description: "IDs de documentos e processos devem usar bc_id normalizado (^[a-z]+$)"
+    severity: "HIGH"
+    validation_type: "naming_convention"
+    enforced_by: "scripts/validate-ids.sh"
+    notes: "Alinhado com naming convention da Forger Resource API"
+
+# Convenções de links entre artefatos
+
+link_conventions:
+  upstream:
+    description: "Links para artefatos que MOTIVAM este requisito (backward traceability)"
+    examples:
+      - "FR-001 tem upstream: [UJ-04-001, UJ-04-003]"
+      - "UJ-04-001 tem upstream: [VIS-02-001]"
+    field_names: ["source_journeys", "source_vision", "upstream"]
+
+  downstream:
+    description: "Links para artefatos DERIVADOS deste requisito (forward traceability)"
+    examples:
+      - "UJ-04-001 tem downstream: [FR-001, FR-005, FR-010]"
+      - "FR-001 tem downstream: [INV-001, PROC-lic-001, DOC-lic-Edital]"
+    field_names: ["linked_frs", "linked_invariants", "linked_processes", "linked_documents", "downstream"]
+
+  bidirectional:
+    description: "Rastreabilidade completa requer ambos upstream E downstream"
+    required_coverage: "≥90% para liberar geração de specs (validado por VR capability)"
+
+# Estrutura de RTM (Requirements Traceability Matrix)
+
+rtm_structure:
+  description: "RTM.yaml é gerado automaticamente por scripts/generate-rtm.sh a partir de frontmatter"
+  format: "YAML com grafo de dependências bidirecionais"
+  generation: "Executado automaticamente pela skill validate-traceability"
+  example:
+    journeys:
+      UJ-04-001:
+        title: "Journey title"
+        downstream: ["FR-001", "FR-005"]
+        upstream: ["VIS-02-001"]
+    functional_requirements:
+      FR-001:
+        title: "FR title"
+        downstream: ["INV-001", "PROC-lic-001"]
+        upstream: ["UJ-04-001"]
+    invariants:
+      INV-001:
+        description: "Invariant description"
+        downstream: ["spec_documentos.json"]
+        upstream: ["FR-001"]
+
+# Métricas de qualidade de rastreabilidade
+
+quality_metrics:
+  upstream_coverage:
+    description: "% de FRs com pelo menos 1 link upstream (source_journeys)"
+    target: "≥90%"
+    calculation: "(FRs com upstream / Total FRs) × 100"
+
+  downstream_coverage:
+    description: "% de FRs com pelo menos 1 link downstream (specs)"
+    target: "≥85%"
+    calculation: "(FRs com downstream / Total FRs) × 100"
+
+  orphan_rate:
+    description: "% de links para IDs inexistentes"
+    target: "0%"
+    calculation: "(Links órfãos / Total links) × 100"
+    halt_condition: ">5% bloqueia geração de specs"
+
+  isolation_rate:
+    description: "% de requisitos sem upstream NEM downstream"
+    target: "0%"
+    calculation: "(Requisitos isolados / Total requisitos) × 100"
+
+# Integração com workflow de agentes
+
+agent_integration:
+  analista_de_negocio:
+    responsibility: "Criar IDs ao escrever PRD + ANEXOS, preencher links em frontmatter"
+    validation: "Step 8 - Auto-validação via skill validate-traceability (structural_only)"
+
+  orquestrador_pm:
+    capability_VR: "Validar Rastreabilidade - invoca validate-traceability (structural_and_semantic)"
+    capability_CIA: "Change Impact Analysis - invoca analyze-change-impact para calcular impacto de mudanças"
+
+  qa_de_specs:
+    validation: "Step 0 - Pré-validação de rastreabilidade antes de gerar specs (coverage ≥90%)"
+
+# Notas de implementação
+
+implementation_notes:
+  - note: "Scripts usam yq/jq para parsing de YAML frontmatter (não LLM)"
+  - note: "Validação estrutural é determinística e zero-cost (sem tokens LLM)"
+  - note: "Validação semântica é opcional e invocada apenas quando necessário"
+  - note: "RTM.yaml é regenerado a cada validação (não versionado no Git, pois é derivado)"
+  - note: "ID_SCHEMA.yaml é versionado no Git e copiado para projetos concretos pelo init-project.sh"
+
+# Changelog
+
+changelog:
+  - version: "1.0"
+    date: "2026-04-17"
+    author: "Arquitetura de Agentes YC Platform"
+    changes: "Versão inicial do schema de IDs para rastreabilidade de requisitos"
