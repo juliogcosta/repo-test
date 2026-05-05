@@ -12,6 +12,7 @@
 | BC-01 | comercial | Lead, Conta, Oportunidade | MVP |
 | BC-01 | comercial | Contato (entidade filha de Conta) | MVP |
 | BC-01 | comercial | HistoricoVenda (projection — read model) | MVP |
+| BC-01 | comercial | SolicitacaoSubstituicao | MVP |
 | BC-02 | posvenda | Ticket | Fase 2 — fora do MVP |
 
 ---
@@ -109,7 +110,7 @@
 | conta_id | UUID (ref Conta) | Sim | Conta associada |
 | vendedor_responsavel_id | UUID (ref Usuario) | Sim | Vendedor responsavel |
 | estagio | enum | Sim | `PropostaEnviada`, `Negociacao`, `Fechamento`, `Ganha`, `Perdida` |
-| valor_estimado | decimal (R$) | **Sim** | Valor estimado do negocio. Obrigatorio. |
+| valor_estimado | decimal (R$) | **Sim** | Valor estimado da Oportunidade. Obrigatório. |
 | motivo_perda | string (texto livre) | **Sim se estagio = Perdida** | Motivo do nao-fechamento. Texto livre. Obrigatorio quando estagio = Perdida. |
 | lead_origem_id | UUID (ref Lead) | Nao | Lead que originou (se via conversao) |
 | criado_por_id | UUID (ref Usuario) | Sim | Usuario que criou |
@@ -121,6 +122,7 @@
 - Oportunidade `Ganha` ou `Perdida` nao pode mudar de estagio.
 - `motivo_perda` obrigatorio quando e somente quando `estagio = Perdida`.
 - `fechado_em` so e preenchido quando `estagio = Ganha` ou `estagio = Perdida`.
+- `estagio` na criacao deve ser `PropostaEnviada` (valor fixo inicial obrigatorio).
 
 **Eventos de dominio**:
 - `OportunidadeCriada`
@@ -163,6 +165,38 @@
 
 ---
 
+---
+
+#### Aggregate: SolicitacaoSubstituicao
+
+> Aggregate Root no BC comercial. Representa o ciclo de vida de uma solicitacao de substituicao iniciada pelo Vendedor e decidida pelo Gerente Comercial.
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| id | UUID | Sim | Identificador unico |
+| vendedor_solicitante_id | UUID (ref Usuario) | Sim | Vendedor que solicita substituicao |
+| lead_id | UUID (ref Lead) | Condicional | Lead alvo (se escopo inclui Lead ainda nao convertido) |
+| oportunidade_id | UUID (ref Oportunidade) | Condicional | Oportunidade alvo (se existente) |
+| motivo | text | Sim | Motivo da solicitacao (texto livre) |
+| status | enum | Sim | `Pendente`, `Aprovada`, `Recusada` |
+| vendedor_substituto_id | UUID (ref Usuario) | Condicional | Preenchido pelo Gerente Comercial na aprovacao |
+| criado_em | timestamp | Sim | Data/hora da solicitacao |
+| decidido_em | timestamp | Nao | Data/hora da decisao do Gerente Comercial |
+
+**Invariantes**:
+- `motivo` nao pode ser nulo ou vazio.
+- `lead_id` ou `oportunidade_id` deve estar preenchido (pelo menos um).
+- `vendedor_substituto_id` e obrigatorio quando `status = Aprovada`.
+- `status` inicial = `Pendente`.
+- Apenas o proprio Vendedor pode criar SolicitacaoSubstituicao para seus proprios registros.
+
+**Eventos de dominio**:
+- `SubstituicaoSolicitada` — disparado na criacao da solicitacao
+- `SubstituicaoAprovada` — disparado quando Gerente Comercial aprova; aciona reatribuicao de Lead e Oportunidade vinculada
+- `SubstituicaoRecusada` — disparado quando Gerente Comercial recusa; VendedorResponsavel permanece inalterado
+
+---
+
 ### Relacionamentos (BC Comercial)
 
 ```
@@ -176,6 +210,11 @@ Oportunidade (N) <----------> (1) Conta
 Oportunidade (N) <----------> (1) Vendedor (responsavel)
 
 HistoricoVenda <-- projection de -- Oportunidade [estagio = Ganha]
+
+SolicitacaoSubstituicao (N) <-----> (1) Lead [opcional — lead_id]
+SolicitacaoSubstituicao (N) <-----> (1) Oportunidade [opcional — oportunidade_id]
+SolicitacaoSubstituicao (N) <-----> (1) Usuario [vendedor_solicitante_id]
+SolicitacaoSubstituicao (N) <-----> (0..1) Usuario [vendedor_substituto_id — preenchido na aprovacao]
 ```
 
 ---

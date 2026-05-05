@@ -20,7 +20,7 @@
 - Vendedores sem background do cliente ao iniciar contato.
 - Gap entre area comercial e equipe de Engenharia no handoff de contratos fechados.
 
-**Solucao**: Aplicacao web interna B2B, single-tenant (Ycodify), com gestao de Leads, Contas, Contatos, Pipeline de Oportunidades, Historico de Vendas e notificacao automatica da Engenharia ao fechar negocio.
+**Solucao**: Aplicacao web interna B2B, single-tenant (Ycodify), com gestao de Leads, Contas, Contatos, Pipeline de Oportunidades, Historico de Vendas e notificação automática da Engenharia ao fechar a Oportunidade.
 
 **Driver estrategico**: Solucao propria para cortar custos com CRMs externos e adaptar o fluxo exatamente ao processo da Ycodify.
 
@@ -281,6 +281,8 @@ Ver ANEXO C — Integrations. Resumo:
 | FR-012 | Historico de Vendas — metricas agregadas | Usuario consulta totais de vendas por periodo, por vendedor e por conta, respeitando visibilidade por perfil. | Gerente Comercial, Gestor | Metricas calculadas corretamente. Vendedor ve apenas seus proprios totais. |
 | FR-013 | Visibilidade por perfil | Sistema aplica regras de visibilidade em todos os modulos: Vendedor (seus), Gerente (time), Gestor (tudo). | Sistema | Vendedor nao ve registros de outros vendedores. Gerente ve time. Gestor ve tudo. |
 | FR-014 | Redistribuicao de Oportunidade pelo Gerente | Gerente Comercial pode alterar o VendedorResponsavel de qualquer Lead ou Oportunidade a qualquer momento. | Gerente Comercial | Responsavel alterado. Evento OportunidadeResponsavelAlterado registrado. |
+| FR-015 | Solicitacao de Substituicao de Vendedor | O Vendedor pode solicitar sua propria substituicao na conducao de um Lead ou Oportunidade. A solicitacao exige preenchimento obrigatorio de motivo (texto livre). A solicitacao e encaminhada ao Gerente Comercial para aprovacao. Distinto de FR-014 (que e iniciativa do Gerente): este fluxo e iniciativa do proprio Vendedor. | Vendedor | Dado que Vendedor preenche motivo e confirma solicitacao, quando submete, entao Gerente Comercial recebe notificacao com dados do Lead/Oportunidade e motivo informado. |
+| FR-016 | Aprovacao de Substituicao pelo Gerente Comercial | O Gerente Comercial recebe a solicitacao de substituicao, avalia, escolhe o Vendedor substituto e aprova ou recusa. Se aprovado, o Lead e a Oportunidade vinculada sao transferidos ao substituto. Se recusado, o Vendedor solicitante permanece responsavel. | Gerente Comercial | Dado que Gerente recebe solicitacao, quando aprova e escolhe substituto, entao Lead + Oportunidade vinculada sao reatribuidos ao substituto e evento SubstituicaoAprovada e disparado. Quando recusa, evento SubstituicaoRecusada e disparado e responsavel permanece inalterado. |
 
 ---
 
@@ -331,6 +333,9 @@ prd_metadata:
         - nome: "Oportunidade"
           tecnico_id: "oportunidade"
           fr_relacionados: ["FR-008", "FR-009", "FR-010", "FR-013", "FR-014"]
+        - nome: "SolicitacaoSubstituicao"
+          tecnico_id: "solicitacaosubstituicao"
+          fr_relacionados: ["FR-015", "FR-016"]
       entidades:
         - nome: "Contato"
           tecnico_id: "contato"
@@ -371,11 +376,11 @@ prd_metadata:
     - id: "vendedor"
       tecnico_id: "vendedor"
       perfil_acesso: "proprios_registros"
-      fr_relacionados: ["FR-001", "FR-002", "FR-003", "FR-004", "FR-008", "FR-009", "FR-010", "FR-011", "FR-012"]
+      fr_relacionados: ["FR-001", "FR-002", "FR-003", "FR-004", "FR-008", "FR-009", "FR-010", "FR-011", "FR-012", "FR-015"]
     - id: "gerentecomercial"
       tecnico_id: "gerentecomercial"
       perfil_acesso: "registros_do_time"
-      fr_relacionados: ["FR-002", "FR-004", "FR-006", "FR-007", "FR-008", "FR-009", "FR-010", "FR-011", "FR-012", "FR-014"]
+      fr_relacionados: ["FR-002", "FR-004", "FR-006", "FR-007", "FR-008", "FR-009", "FR-010", "FR-011", "FR-012", "FR-014", "FR-016"]
     - id: "gestor"
       tecnico_id: "gestor"
       perfil_acesso: "todos_os_registros"

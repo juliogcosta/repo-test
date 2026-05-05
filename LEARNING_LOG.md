@@ -1,7 +1,7 @@
 ---
-version: "1.1"
-last_updated: "2026-04-30"
-total_entries: 8
+version: "1.2"
+last_updated: "2026-05-05"
+total_entries: 9
 ---
 
 # Learning Log — Pendencias e Licoes (Projeto CRM)
@@ -148,11 +148,37 @@ promoted_question: null
 notes: "Criterios que tornam um Lead 'Qualificado' nao foram detalhados (decisao do Vendedor, sem regra sistematica). Regras de redistribuicao (notificacao ao vendedor anterior, restricoes de momento) nao detalhadas."
 ```
 
+### Entry 009
+```yaml
+id: "009"
+date_first_occurred: "2026-05-05"
+date_last_occurred: "2026-05-05"
+frequency: 1
+context: "Analise pos-MP passagem 1 — artefatos PRD.md, ANEXO_A, ANEXO_B, ANEXO_C"
+missing_info_type: "DRIFT-CORRECTION: drift semantico leve detectado por Lexicon (forbidden patterns, inconsistencia de casing, lacunas no glossario)"
+section_affected: "PRD.md (Secao 1), ANEXO_A_ProcessDetails.md (P-02), ANEXO_B_DataModels.md (Aggregate Oportunidade), UBIQUITOUS_LANGUAGE.yaml"
+projects_affected:
+  - "crm"
+promoted_to_questionnaire: false
+promoted_at: null
+promoted_question: null
+notes: |
+  Correcoes aplicadas: DRIFT-01 (Proposta Enviada — contexto de Conta), DRIFT-02 (forbidden pattern 'negocio'),
+  DRIFT-04 (motivoPerda → motivo_perda), DRIFT-05 (valorEstimado → valor_estimado),
+  DRIFT-06 (Em Contato → EmContato em enums), DRIFT-07 (Proposta Enviada → PropostaEnviada em enums),
+  INC-02 (invariante estagio inicial Oportunidade), INC-03 (synonym HistoricoVenda).
+  Glossario enriquecido v1.1 → v1.2 com 9 novos termos (Roles + Domain Events ausentes).
+  Pendencias abertas: INC-01 (Jornada 1 omite Gerente como ator de conversao — corrigir em ciclo 2),
+  INC-05 (base de calculo regra 5 dias — decisao pendente cliente).
+  INC-04 resolvida via ContaCriada notes.
+  Aprendizado: Catalogar Roles e Domain Events no glossario ANTES de redigir ANEXOS evita drift de casing e inconsistencias entre artefatos.
+```
+
 ---
 
 ## Estatisticas
 
-**Total de Pendencias Registradas**: 8
+**Total de Pendencias Registradas**: 9
 **Pendencias Promovidas para Questionario**: 0
 **Ciclo de Refinamento Previsto**: VE (Validacao de Especificacao)
 
@@ -162,6 +188,7 @@ notes: "Criterios que tornam um Lead 'Qualificado' nao foram detalhados (decisao
 3. Integracoes nao detalhadas (1 entrada: 004)
 4. NFRs (1 entrada: 005)
 5. Refinamentos opcionais (1 entrada: 007)
+6. Correcoes de drift semantico pos-passagem 1 (1 entrada: 009)
 
 ---
 
@@ -169,3 +196,4 @@ notes: "Criterios que tornam um Lead 'Qualificado' nao foram detalhados (decisao
 
 - **2026-04-30**: Estrutura inicial criada (v1.0) — template vazio
 - **2026-04-30**: v1.1 — 8 pendencias registradas ao final da passagem 1 da sessao MP
+- **2026-05-05**: v1.2 — Entry 009 adicionada (correcoes de drift Lexicon, glossario v1.2)

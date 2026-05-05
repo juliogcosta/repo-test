@@ -10,8 +10,8 @@
 
 metadata:
   project: "crm"
-  version: "1.1"
-  last_updated: "2026-04-30"
+  version: "1.3"
+  last_updated: "2026-05-05"
   maintainer: "Analista de Negocio (Sofia) + Guardiao de Linguagem Ubiqua"
   bounded_contexts:
     - "comercial"
@@ -47,6 +47,19 @@ global_terms:
     notes: "Transicao Qualificado -> Convertido. Nao confundir com 'criar Conta manualmente'."
     added_date: "2026-04-30"
     added_by: "Analista de Negocio (Sofia)"
+
+  - term: "Gestor"
+    definition: "Usuario com perfil estrategico que possui visibilidade irrestrita e consolidada de todos os registros do CRM (Leads, Contas, Contatos, Oportunidades, HistoricoVenda) de todos os times. Nao opera registros diretamente — sua funcao e analise e decisao gerencial."
+    synonyms: []
+    forbidden_synonyms: ["admin", "administrador"]
+    type: "Role"
+    related_terms: ["GerenteComercial"]
+    examples:
+      - "Gestor visualiza metricas agregadas de HistoricoVenda por periodo e por Vendedor."
+      - "Gestor acompanha pipeline completo de todas as equipes comerciais."
+    notes: "Perfil de leitura irrestrita. Diferente de GerenteComercial (que opera registros do seu time)."
+    added_date: "2026-05-05"
+    added_by: "Guardiao de Linguagem Ubiqua (Lexicon)"
 
 # ==============================================================================
 # GLOSSARIO POR BOUNDED CONTEXT
@@ -203,6 +216,8 @@ bounded_context_terms:
       value_object: false
       entity: false
       domain_event: false
+      synonyms:
+        - "Histórico de Vendas"
       invariants:
         - "Somente leitura — nenhuma alteracao e permitida."
         - "Dados derivados de Oportunidades Ganhas. Nao ha tabela/colecao independente."
@@ -241,6 +256,202 @@ bounded_context_terms:
       examples:
         - "OportunidadePerdida disparado com motivo: 'Preco acima do orcamento do cliente'."
       notes: ""
+
+    - term: "GerenteComercial"
+      definition: "Usuario com perfil de gerencia que supervisiona o time comercial. Tem visibilidade de todos os Leads, Contas, Oportunidades e HistoricoVenda do time. Pode criar, redistribuir e converter Leads e Oportunidades. Recebe notificacoes de alertas do time (ex.: Lead sem interacao ha 5 dias)."
+      scope: "Role no BC comercial."
+      aggregate: false
+      value_object: false
+      entity: false
+      domain_event: false
+      type: "Role"
+      related_terms: ["Gestor", "VendedorResponsavel"]
+      examples:
+        - "GerenteComercial redistribui Oportunidade de Vendedor afastado para outro Vendedor."
+        - "GerenteComercial recebe notificacao de Lead sem contato ha 5 dias."
+      notes: "Diferente de Gestor: GerenteComercial opera registros do seu time; Gestor apenas consulta de forma irrestrita."
+      added_date: "2026-05-05"
+      added_by: "Guardiao de Linguagem Ubiqua (Lexicon)"
+
+    - term: "StatusLead"
+      definition: "Valor enumerado representando a fase atual do Lead no ciclo de captacao e qualificacao. Determina as transicoes permitidas e as regras de negocio aplicaveis."
+      scope: "Value Object no BC comercial."
+      aggregate: false
+      value_object: true
+      entity: false
+      domain_event: false
+      type: "ValueObject"
+      values:
+        - "Novo"
+        - "EmContato"
+        - "Qualificado"
+        - "Convertido"
+        - "Descartado"
+      related_terms: ["Lead", "EstagioOportunidade"]
+      examples:
+        - "Lead recem-criado via formulario web → StatusLead = Novo."
+        - "Vendedor registra primeiro contato → StatusLead = EmContato."
+      notes: "Usar PascalCase sem espaco para valores de enum (EmContato, nao 'Em Contato'). Forma natural 'Em Contato' e aceitavel apenas em prosa/UI."
+      added_date: "2026-05-05"
+      added_by: "Guardiao de Linguagem Ubiqua (Lexicon)"
+
+    - term: "LeadCriado"
+      definition: "Evento de dominio disparado ao criar um Lead, independente da origem (formulario web ou entrada manual por Vendedor/GerenteComercial). Registra origem, responsavel e timestamp de criacao."
+      scope: "Domain Event no BC comercial."
+      aggregate: false
+      value_object: false
+      entity: false
+      domain_event: true
+      type: "DomainEvent"
+      related_terms: ["Lead", "LeadConvertido"]
+      examples:
+        - "Sistema recebe submissao de formulario web → dispara LeadCriado com origem=formulario_web."
+        - "Vendedor cria Lead manualmente → dispara LeadCriado com origem=manual."
+      notes: ""
+      added_date: "2026-05-05"
+      added_by: "Guardiao de Linguagem Ubiqua (Lexicon)"
+
+    - term: "LeadConvertido"
+      definition: "Evento de dominio disparado ao transicionar Lead para StatusLead=Convertido. Aciona automaticamente a criacao de uma Conta (se nao existente) e de uma Oportunidade vinculada."
+      scope: "Domain Event no BC comercial."
+      aggregate: false
+      value_object: false
+      entity: false
+      domain_event: true
+      type: "DomainEvent"
+      related_terms: ["Lead", "OportunidadeCriada", "ContaCriada", "Conversao"]
+      examples:
+        - "Vendedor qualifica Lead e executa conversao → dispara LeadConvertido → sistema cria Conta + Oportunidade."
+      notes: ""
+      added_date: "2026-05-05"
+      added_by: "Guardiao de Linguagem Ubiqua (Lexicon)"
+
+    - term: "LeadDescartado"
+      definition: "Evento de dominio disparado ao transicionar Lead para StatusLead=Descartado. O Lead e preservado como historico — nao e removido do sistema."
+      scope: "Domain Event no BC comercial."
+      aggregate: false
+      value_object: false
+      entity: false
+      domain_event: true
+      type: "DomainEvent"
+      related_terms: ["Lead", "LeadConvertido"]
+      examples:
+        - "Vendedor descarta Lead sem fit → dispara LeadDescartado → Lead permanece com StatusLead=Descartado para auditoria."
+      notes: ""
+      added_date: "2026-05-05"
+      added_by: "Guardiao de Linguagem Ubiqua (Lexicon)"
+
+    - term: "OportunidadeCriada"
+      definition: "Evento de dominio disparado ao criar uma Oportunidade, seja via conversao de Lead (automatico) ou por criacao direta pelo GerenteComercial. Estagio inicial e sempre PropostaEnviada."
+      scope: "Domain Event no BC comercial."
+      aggregate: false
+      value_object: false
+      entity: false
+      domain_event: true
+      type: "DomainEvent"
+      related_terms: ["Oportunidade", "LeadConvertido", "OportunidadeGanha"]
+      examples:
+        - "LeadConvertido dispara criacao automatica → OportunidadeCriada com estagio=PropostaEnviada."
+      notes: ""
+      added_date: "2026-05-05"
+      added_by: "Guardiao de Linguagem Ubiqua (Lexicon)"
+
+    - term: "OportunidadeResponsavelAlterado"
+      definition: "Evento de dominio disparado quando o GerenteComercial redistribui uma Oportunidade, alterando o VendedorResponsavel. Registrado para auditoria e rastreabilidade da cadeia de responsabilidade."
+      scope: "Domain Event no BC comercial."
+      aggregate: false
+      value_object: false
+      entity: false
+      domain_event: true
+      type: "DomainEvent"
+      related_terms: ["Oportunidade", "VendedorResponsavel", "GerenteComercial"]
+      examples:
+        - "GerenteComercial reatribui Oportunidade de Vendedor afastado → OportunidadeResponsavelAlterado registrado com vendedor_anterior e vendedor_novo."
+      notes: ""
+      added_date: "2026-05-05"
+      added_by: "Guardiao de Linguagem Ubiqua (Lexicon)"
+
+    - term: "ContaCriada"
+      definition: "Evento de dominio disparado ao criar uma Conta, seja automaticamente via conversao de Lead ou manualmente pelo GerenteComercial. O VendedorResponsavel da Conta e herdado do Lead de origem na conversao automatica."
+      scope: "Domain Event no BC comercial."
+      aggregate: false
+      value_object: false
+      entity: false
+      domain_event: true
+      type: "DomainEvent"
+      related_terms: ["Conta", "LeadConvertido", "VendedorResponsavel"]
+      examples:
+        - "LeadConvertido dispara criacao de Conta → ContaCriada com vendedor_responsavel_id herdado do Lead."
+      notes: "Resolve INCONSISTENCIA-04: VendedorResponsavel da Conta e herdado do Lead na conversao automatica. Em criacao manual pelo GerenteComercial, o campo deve ser preenchido explicitamente."
+      added_date: "2026-05-05"
+      added_by: "Guardiao de Linguagem Ubiqua (Lexicon)"
+
+    - term: "SolicitacaoSubstituicao"
+      definition: "Registro formal da solicitacao de um Vendedor para ser substituido na conducao de um Lead ou Oportunidade. Passa pelos estados Pendente → Aprovada | Recusada, com decisao e escolha do substituto pelo GerenteComercial."
+      scope: "Aggregate Root no BC comercial."
+      aggregate: true
+      value_object: false
+      entity: false
+      domain_event: false
+      type: "Aggregate"
+      invariants:
+        - "motivo nao pode ser nulo ou vazio."
+        - "lead_id ou oportunidade_id deve estar preenchido (pelo menos um)."
+        - "vendedor_substituto_id obrigatorio quando status = Aprovada."
+        - "status inicial = Pendente."
+        - "Apenas o proprio Vendedor pode criar SolicitacaoSubstituicao para seus proprios registros."
+      related_terms: ["Lead", "Oportunidade", "VendedorResponsavel", "GerenteComercial", "SubstituicaoSolicitada", "SubstituicaoAprovada", "SubstituicaoRecusada"]
+      examples:
+        - "Vendedor abre SolicitacaoSubstituicao para Lead 'Empresa XYZ' com motivo 'conflito de agenda permanente'."
+        - "GerenteComercial aprova SolicitacaoSubstituicao e designa VendedorSubstituto — Lead e Oportunidade sao reatribuidos."
+      notes: "Distinto de FR-014 (redistribuicao por iniciativa do Gerente). SolicitacaoSubstituicao e iniciativa do proprio Vendedor. Fluxos coexistem."
+      added_date: "2026-05-05"
+      added_by: "Analista de Negocio (Sofia)"
+
+    - term: "SubstituicaoSolicitada"
+      definition: "Evento de dominio disparado quando Vendedor submete solicitacao de substituicao com motivo preenchido. Coloca SolicitacaoSubstituicao em estado Pendente e notifica o GerenteComercial."
+      scope: "Domain Event no BC comercial."
+      aggregate: false
+      value_object: false
+      entity: false
+      domain_event: true
+      type: "DomainEvent"
+      related_terms: ["SolicitacaoSubstituicao", "SubstituicaoAprovada", "SubstituicaoRecusada"]
+      examples:
+        - "Vendedor confirma solicitacao → SubstituicaoSolicitada disparado → GerenteComercial notificado com dados do Lead/Oportunidade e motivo."
+      notes: ""
+      added_date: "2026-05-05"
+      added_by: "Analista de Negocio (Sofia)"
+
+    - term: "SubstituicaoAprovada"
+      definition: "Evento de dominio disparado quando GerenteComercial aprova a SolicitacaoSubstituicao e designa VendedorSubstituto. Aciona reatribuicao de Lead e Oportunidade vinculada ao substituto."
+      scope: "Domain Event no BC comercial."
+      aggregate: false
+      value_object: false
+      entity: false
+      domain_event: true
+      type: "DomainEvent"
+      related_terms: ["SolicitacaoSubstituicao", "SubstituicaoSolicitada", "VendedorResponsavel", "GerenteComercial"]
+      examples:
+        - "GerenteComercial aprova solicitacao e escolhe substituto → SubstituicaoAprovada disparado → Lead e Oportunidade reatribuidos ao VendedorSubstituto."
+      notes: ""
+      added_date: "2026-05-05"
+      added_by: "Analista de Negocio (Sofia)"
+
+    - term: "SubstituicaoRecusada"
+      definition: "Evento de dominio disparado quando GerenteComercial recusa a SolicitacaoSubstituicao. VendedorResponsavel permanece inalterado. Vendedor solicitante e notificado."
+      scope: "Domain Event no BC comercial."
+      aggregate: false
+      value_object: false
+      entity: false
+      domain_event: true
+      type: "DomainEvent"
+      related_terms: ["SolicitacaoSubstituicao", "SubstituicaoSolicitada", "VendedorResponsavel", "GerenteComercial"]
+      examples:
+        - "GerenteComercial recusa solicitacao → SubstituicaoRecusada disparado → VendedorResponsavel permanece o mesmo → Vendedor solicitante notificado."
+      notes: ""
+      added_date: "2026-05-05"
+      added_by: "Analista de Negocio (Sofia)"
 
   posvenda:
     - term: "Ticket"
@@ -371,15 +582,45 @@ changelog:
     terms_modified: []
     terms_removed: []
 
+  - version: "1.2"
+    date: "2026-05-05"
+    author: "Guardiao de Linguagem Ubiqua (Lexicon)"
+    changes: "Correcoes de drift semantico pos-passagem 1 + enriquecimento do glossario com Roles, StatusLead e Domain Events ausentes"
+    terms_added:
+      - "Gestor"
+      - "GerenteComercial"
+      - "StatusLead"
+      - "LeadCriado"
+      - "LeadConvertido"
+      - "LeadDescartado"
+      - "OportunidadeCriada"
+      - "OportunidadeResponsavelAlterado"
+      - "ContaCriada"
+    terms_modified:
+      - "HistoricoVenda (adicionado campo synonyms: 'Historico de Vendas')"
+    terms_removed: []
+
+  - version: "1.3"
+    date: "2026-05-05"
+    author: "Analista de Negocio (Sofia)"
+    changes: "Adicao cirurgica — nova funcionalidade FR-015/FR-016: Solicitacao de Substituicao de Vendedor. Novos termos: SolicitacaoSubstituicao (Aggregate) + 3 Domain Events."
+    terms_added:
+      - "SolicitacaoSubstituicao"
+      - "SubstituicaoSolicitada"
+      - "SubstituicaoAprovada"
+      - "SubstituicaoRecusada"
+    terms_modified: []
+    terms_removed: []
+
 # ==============================================================================
 # STATISTICS
 # ==============================================================================
 
 statistics:
-  total_global_terms: 2
-  total_bc_terms: 12
+  total_global_terms: 3
+  total_bc_terms: 24
   total_ambiguous_terms: 0
-  total_drift_incidents: 0
-  conformity_rate: 1.00
-  last_drift_check: "2026-04-30T00:00:00"
-  most_violated_rule: "N/A"
+  total_drift_incidents: 7
+  conformity_rate: 0.98
+  last_drift_check: "2026-05-05T00:00:00"
+  most_violated_rule: "VR-002 (forbidden pattern: 'negocio' como sinonimo de Oportunidade)"

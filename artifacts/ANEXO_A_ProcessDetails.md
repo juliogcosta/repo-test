@@ -13,6 +13,7 @@
 | P-02 | Pipeline de Vendas / Oportunidade | comercial | APROVADO |
 | P-03 | Historico de Vendas | comercial | APROVADO |
 | P-04 | Tickets Pos-Venda | posvenda | FASE 2 — fora do MVP |
+| P-05 | Solicitacao de Substituicao de Vendedor | comercial | APROVADO |
 
 ---
 
@@ -33,15 +34,15 @@
 ### Estados do Lead
 
 ```
-Novo --> Em Contato --> Qualificado --> Convertido
+Novo --> EmContato --> Qualificado --> Convertido
                     --> Descartado
-         Em Contato --> Descartado
+         EmContato --> Descartado
 ```
 
 | Estado | Descricao |
 |--------|-----------|
 | **Novo** | Lead recem-criado. Ainda sem interacao registrada. |
-| **Em Contato** | Vendedor iniciou contato (ex: ligacao, e-mail). |
+| **EmContato** | Vendedor iniciou contato (ex: ligacao, e-mail). |
 | **Qualificado** | Lead confirmado como potencial cliente. Pronto para conversao. |
 | **Convertido** | Lead convertido em Conta + Oportunidade. Permanece como historico. |
 | **Descartado** | Lead descartado. Permanece como historico. |
@@ -65,10 +66,10 @@ Novo --> Em Contato --> Qualificado --> Convertido
     v
 [Lead: Novo]
     |
-    +--> Vendedor registra primeiro contato --> [Lead: Em Contato]
+    +--> Vendedor registra primeiro contato --> [Lead: EmContato]
     |
     v
-[Lead: Em Contato]
+[Lead: EmContato]
     |
     +--> Vendedor qualifica o Lead --> [Lead: Qualificado]
     |
@@ -126,17 +127,17 @@ Novo --> Em Contato --> Qualificado --> Convertido
 ### Estados da Oportunidade
 
 ```
-Proposta Enviada --> Negociacao --> Fechamento --> Ganha
+PropostaEnviada --> Negociacao --> Fechamento --> Ganha
                                                --> Perdida
 ```
 
 | Estado | Descricao |
 |--------|-----------|
-| **Proposta Enviada** | Proposta comercial enviada ao cliente. |
+| **PropostaEnviada** | Proposta comercial enviada à Conta (para o Contato principal). |
 | **Negociacao** | Negociacao em andamento (valores, escopo, prazo). |
 | **Fechamento** | Acordo proximo. Ultima fase antes de resultado final. |
-| **Ganha** | Negocio fechado com sucesso. Dispara evento OportunidadeGanha. |
-| **Perdida** | Negociacao encerrada sem fechamento. Campo motivoPerda obrigatorio (texto livre). |
+| **Ganha** | Oportunidade fechada com sucesso. Dispara evento OportunidadeGanha. |
+| **Perdida** | Negociacao encerrada sem fechamento. Campo motivo_perda obrigatorio (texto livre). |
 
 ---
 
@@ -147,13 +148,13 @@ Proposta Enviada --> Negociacao --> Fechamento --> Ganha
     |
     +-- (Via conversao de Lead) --> [Sistema cria Oportunidade]
     |                                   responsavel = Vendedor do Lead
-    |                                   valorEstimado = obrigatorio (R$)
+    |                                   valor_estimado = obrigatorio (R$)
     |
     +-- (Criacao direta)        --> [Gerente Comercial cria Oportunidade para Conta existente]
-    |                                   valorEstimado = obrigatorio (R$)
+    |                                   valor_estimado = obrigatorio (R$)
     |
     v
-[Oportunidade: Proposta Enviada]
+[Oportunidade: PropostaEnviada]
     |
     +--> Vendedor/Gerente avanca  --> [Oportunidade: Negociacao]
     |
@@ -172,7 +173,7 @@ Proposta Enviada --> Negociacao --> Fechamento --> Ganha
     |                   v
     |              [FIM — Oportunidade encerrada como Ganha, preservada como historico]
     |
-    +--> PERDIDA --> [motivoPerda: texto livre — OBRIGATORIO]
+    +--> PERDIDA --> [motivo_perda: texto livre — OBRIGATORIO]
                      [Oportunidade: Perdida]
                      [FIM — Oportunidade encerrada como Perdida, preservada como historico]
 ```
@@ -187,8 +188,8 @@ Proposta Enviada --> Negociacao --> Fechamento --> Ganha
 | RN-O02 | Gerente Comercial pode redistribuir (alterar responsavel) de qualquer Oportunidade a qualquer momento. | Gerente Comercial |
 | RN-O03 | A transicao para estado Ganha dispara automaticamente: (a) envio de e-mail a Engenharia, (b) notificacao ao sistema da Engenharia (integracao futura). | Sistema |
 | RN-O04 | Oportunidades ganhas e perdidas sao preservadas como historico (nao excluidas). | — |
-| RN-O05 | Campo `valorEstimado` (R$) e obrigatorio ao criar ou editar a Oportunidade. | Vendedor, Gerente Comercial |
-| RN-O06 | A transicao para estado Perdida exige preenchimento obrigatorio do campo `motivoPerda` (texto livre). | Vendedor, Gerente Comercial |
+| RN-O05 | Campo `valor_estimado` (R$) e obrigatorio ao criar ou editar a Oportunidade. | Vendedor, Gerente Comercial |
+| RN-O06 | A transicao para estado Perdida exige preenchimento obrigatorio do campo `motivo_perda` (texto livre). | Vendedor, Gerente Comercial |
 
 ---
 
@@ -264,3 +265,94 @@ O processo cobre dois modos de acesso:
 
 > Detalhamento adiado para ciclo pos-MVP. Bounded Context: posvenda.
 > Persona envolvida: Atendimento (jornada Fase 2).
+
+---
+
+## P-05 — Solicitacao de Substituicao de Vendedor
+
+### Visao Geral
+
+| Campo | Valor |
+|-------|-------|
+| **Bounded Context** | comercial |
+| **Atores** | Vendedor (solicitante), Gerente Comercial (decisor) |
+| **Trigger** | Vendedor seleciona Lead ou Oportunidade da qual deseja ser substituido |
+| **Pre-condicao** | Lead ou Oportunidade com VendedorResponsavel definido |
+| **Pos-condicao** | SolicitacaoSubstituicao em estado Aprovada (Lead + Oportunidade reatribuidos) ou Recusada (responsavel inalterado) |
+| **FRs relacionados** | FR-015, FR-016 |
+| **Distinção com P-02/FR-014** | FR-014 e redistribuicao por iniciativa do Gerente. P-05/FR-015 e solicitacao por iniciativa do proprio Vendedor. Fluxos distintos que coexistem. |
+
+---
+
+### Estados da SolicitacaoSubstituicao
+
+```
+Pendente --> Aprovada
+         --> Recusada
+```
+
+| Estado | Descricao |
+|--------|-----------|
+| **Pendente** | Solicitacao submetida. Aguardando decisao do Gerente Comercial. Lead/Oportunidade permanecem com Vendedor atual. |
+| **Aprovada** | Gerente aprovou. Lead + Oportunidade vinculada reatribuidos ao VendedorSubstituto. |
+| **Recusada** | Gerente recusou. VendedorResponsavel permanece inalterado. |
+
+---
+
+### Fluxo Principal
+
+```
+[INICIO]
+    |
+    v
+1. Vendedor seleciona Lead ou Oportunidade da qual deseja ser substituido
+
+2. Vendedor preenche motivo (texto livre, obrigatorio) e confirma solicitacao
+    |
+    v
+3. [Sistema dispara evento: SubstituicaoSolicitada]
+    |
+4. [Sistema notifica Gerente Comercial com:]
+    - Dados do Lead/Oportunidade
+    - VendedorResponsavel atual
+    - Motivo informado
+    |
+    v
+5. Gerente Comercial avalia solicitacao e escolhe VendedorSubstituto
+    |
+    +-- [APROVACAO] ------------------------------------------------------+
+    |   Gerente aprova                                                    |
+    |   --> Sistema reatribui Lead ao VendedorSubstituto                  |
+    |   --> Sistema reatribui Oportunidade vinculada ao VendedorSubstituto|
+    |   --> [Sistema dispara evento: SubstituicaoAprovada]                |
+    |   --> Sistema notifica Vendedor solicitante e VendedorSubstituto     |
+    |   --> [FIM — SolicitacaoSubstituicao: Aprovada]                     |
+    |                                                                     |
+    +-- [RECUSA] --------------------------------------------------------+
+        Gerente recusa
+        --> VendedorResponsavel permanece inalterado
+        --> [Sistema dispara evento: SubstituicaoRecusada]
+        --> Sistema notifica Vendedor solicitante (com justificativa — opcional)
+        --> [FIM — SolicitacaoSubstituicao: Recusada]
+```
+
+---
+
+### Regras de Negocio
+
+| ID | Regra | Ator Impactado |
+|----|-------|---------------|
+| RN-P05-01 | Motivo e obrigatorio para submeter solicitacao — campo nao pode ser nulo ou vazio. | Vendedor |
+| RN-P05-02 | Apenas o proprio Vendedor pode iniciar solicitacao de sua substituicao. Nao e possivel solicitar substituicao de outro Vendedor. | Vendedor |
+| RN-P05-03 | Transferencia afeta ambos: Lead (se ainda nao convertido) E Oportunidade vinculada (se existente). | Sistema |
+| RN-P05-04 | Enquanto SolicitacaoSubstituicao esta em estado Pendente, Lead e Oportunidade permanecem com o Vendedor atual. | Sistema |
+
+---
+
+### Perguntas Abertas (pendentes para ciclo futuro)
+
+| ID | Pergunta | Prioridade |
+|----|----------|------------|
+| PA-P05-01 | Um Vendedor pode ter mais de uma SolicitacaoSubstituicao Pendente simultaneamente (para Leads/Oportunidades diferentes)? | Media |
+| PA-P05-02 | Ha prazo para o Gerente decidir sobre a solicitacao? Se sim, qual e o comportamento apos o prazo? | Media |
+| PA-P05-03 | A justificativa do Gerente ao recusar e obrigatoria ou opcional? (Especificacao atual: opcional) | Baixa |
