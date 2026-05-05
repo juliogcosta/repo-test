@@ -655,6 +655,28 @@ INITIALIZED_AT_FULL="qui 30 abr 2026 15:24:12 -03"
 
 ---
 
+## ⚠️ Limitações Conhecidas (Lições de Projeto)
+
+### VR (Validar Rastreabilidade) — Scripts incompatíveis com modo monolithic
+
+**Identificado em**: 2026-05-05 (sessão ciclo 1)
+**Impacto**: Os scripts `validate-ids.sh`, `generate-rtm.sh` e `validate-links.sh` foram projetados para o modo **fragmented** (PRD dividido em seções individuais com frontmatter YAML estruturado, ex.: `PRD_04_UserJourneys.md`, `PRD_08_FunctionalRequirements.md`).
+
+**Em modo monolithic** (`PRD.md` único), os scripts:
+- Extraem **0 IDs** (não reconhecem o formato do PRD monolítico)
+- Geram **RTM vazio** (esperam arquivos que não existem neste modo)
+- `validate-links.sh` fica **bloqueado** por depender do RTM vazio
+
+**Workarounds disponíveis**:
+1. **VR manual (LLM-based)**: Giovanna valida rastreabilidade lendo diretamente os artefatos, sem scripts. Produz `TRACEABILITY_REPORT.md` manualmente. Adequado para passagens intermediárias.
+2. **Migrar para modo fragmented**: Converter `PRD.md` em 10 seções com frontmatter estruturado — habilita scripts completamente. Recomendado antes da fase GE em projetos com ≥15 FRs.
+
+**Decisão tomada neste projeto**: VR adiada (Opção C) — prosseguir para GE direto. Retomar VR após ciclo 2 de refinamento do PRD, possivelmente após migração para modo fragmented.
+
+**Nota para futuras inicializações**: Se o projeto tiver `PRD_MODE=monolithic` no `.claude-context`, alertar o cliente sobre esta limitação antes de executar a capability VR.
+
+---
+
 ## 🔧 Troubleshooting
 
 ### "Agentes não aparecem no @mention"

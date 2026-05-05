@@ -38,13 +38,13 @@ if [[ ! -f "$RTM_FILE" ]]; then
     exit 1
 fi
 
-if ! command -v yq &> /dev/null; then
-    echo -e "${RED}ERROR: yq not installed${NC}"
+if ! command -v /usr/local/bin/yq &> /dev/null; then
+    echo -e "${RED}ERROR: /usr/local/bin/yq not installed${NC}"
     exit 1
 fi
 
 # Extract all existing IDs
-ALL_IDS=$(yq '.nodes | to_entries | .[] | .value | to_entries | .[].key' "$RTM_FILE" | sort -u)
+ALL_IDS=$(/usr/local/bin/yq '.nodes | to_entries | .[] | .value | to_entries | .[].key' "$RTM_FILE" | sort -u)
 
 echo "Total IDs in RTM: $(echo "$ALL_IDS" | wc -l)"
 echo ""
@@ -52,7 +52,7 @@ echo "Validating links..."
 echo ""
 
 # Validate upstream links
-UPSTREAM_LINKS=$(yq '.edges.upstream | to_entries[] | .key as $source | .value[] | "\($source) <- \(.)"' "$RTM_FILE" 2>/dev/null || echo "")
+UPSTREAM_LINKS=$(/usr/local/bin/yq '.edges.upstream | to_entries[] | .key as $source | .value[] | "\($source) <- \(.)"' "$RTM_FILE" 2>/dev/null || echo "")
 
 if [[ -n "$UPSTREAM_LINKS" ]]; then
     while IFS= read -r link; do
@@ -67,7 +67,7 @@ if [[ -n "$UPSTREAM_LINKS" ]]; then
 fi
 
 # Validate downstream links
-DOWNSTREAM_LINKS=$(yq '.edges.downstream | to_entries[] | .key as $source | .value[] | "\($source) -> \(.)"' "$RTM_FILE" 2>/dev/null || echo "")
+DOWNSTREAM_LINKS=$(/usr/local/bin/yq '.edges.downstream | to_entries[] | .key as $source | .value[] | "\($source) -> \(.)"' "$RTM_FILE" 2>/dev/null || echo "")
 
 if [[ -n "$DOWNSTREAM_LINKS" ]]; then
     while IFS= read -r link; do
@@ -83,8 +83,8 @@ fi
 
 # Detect isolated nodes
 while IFS= read -r id; do
-    HAS_UPSTREAM=$(yq ".edges.upstream.\"$id\" // []" "$RTM_FILE" | grep -v "^\[\]$" || echo "")
-    HAS_DOWNSTREAM=$(yq ".edges.downstream.\"$id\" // []" "$RTM_FILE" | grep -v "^\[\]$" || echo "")
+    HAS_UPSTREAM=$(/usr/local/bin/yq ".edges.upstream.\"$id\" // []" "$RTM_FILE" | grep -v "^\[\]$" || echo "")
+    HAS_DOWNSTREAM=$(/usr/local/bin/yq ".edges.downstream.\"$id\" // []" "$RTM_FILE" | grep -v "^\[\]$" || echo "")
 
     if [[ -z "$HAS_UPSTREAM" && -z "$HAS_DOWNSTREAM" ]]; then
         ERRORS+=("Isolated node: $id (no upstream or downstream links)")

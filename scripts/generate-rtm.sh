@@ -16,7 +16,7 @@
 #   0 - RTM generated successfully
 #   1 - Error during generation
 #
-# Dependencies: yq (YAML processor)
+# Dependencies: /usr/local/bin/yq (YAML processor)
 
 set -euo pipefail
 
@@ -41,11 +41,11 @@ echo "Project: $PROJECT_ROOT"
 echo "Output: $OUTPUT_FILE"
 echo ""
 
-# Function: Check if yq is installed
+# Function: Check if /usr/local/bin/yq is installed
 check_dependencies() {
-    if ! command -v yq &> /dev/null; then
-        echo -e "${RED}ERROR: yq is not installed${NC}"
-        echo "Install with: sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && sudo chmod +x /usr/local/bin/yq"
+    if ! command -v /usr/local/bin/yq &> /dev/null; then
+        echo -e "${RED}ERROR: /usr/local/bin/yq is not installed${NC}"
+        echo "Install with: sudo wget -qO /usr/local/bin//usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && sudo chmod +x /usr/local/bin/yq"
         exit 1
     fi
 }
@@ -80,8 +80,8 @@ edges:
 EOF
 
     # Set metadata
-    yq -i ".metadata.generated_at = \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"" "$TEMP_DIR/rtm_base.yaml"
-    yq -i ".metadata.project_root = \"$PROJECT_ROOT\"" "$TEMP_DIR/rtm_base.yaml"
+    /usr/local/bin/yq -i ".metadata.generated_at = \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"" "$TEMP_DIR/rtm_base.yaml"
+    /usr/local/bin/yq -i ".metadata.project_root = \"$PROJECT_ROOT\"" "$TEMP_DIR/rtm_base.yaml"
 }
 
 # Function: Extract User Journeys from PRD Section 4
@@ -99,29 +99,29 @@ extract_user_journeys() {
     echo "Extracting User Journeys from $file..."
 
     local journey_count
-    journey_count=$(yq '.journeys | length' "$file" 2>/dev/null || echo "0")
+    journey_count=$(/usr/local/bin/yq '.journeys | length' "$file" 2>/dev/null || echo "0")
 
     for ((i=0; i<journey_count; i++)); do
         local id title linked_frs linked_sc linked_vision
 
-        id=$(yq ".journeys[$i].id" "$file" 2>/dev/null | tr -d '"')
-        title=$(yq ".journeys[$i].title" "$file" 2>/dev/null | tr -d '"')
-        linked_frs=$(yq ".journeys[$i].linked_frs | @json" "$file" 2>/dev/null | tr -d '"')
-        linked_sc=$(yq ".journeys[$i].linked_success_criteria | @json" "$file" 2>/dev/null | tr -d '"')
-        linked_vision=$(yq ".journeys[$i].linked_vision | @json" "$file" 2>/dev/null | tr -d '"')
+        id=$(/usr/local/bin/yq ".journeys[$i].id" "$file" 2>/dev/null | tr -d '"')
+        title=$(/usr/local/bin/yq ".journeys[$i].title" "$file" 2>/dev/null | tr -d '"')
+        linked_frs=$(/usr/local/bin/yq ".journeys[$i].linked_frs | @json" "$file" 2>/dev/null | tr -d '"')
+        linked_sc=$(/usr/local/bin/yq ".journeys[$i].linked_success_criteria | @json" "$file" 2>/dev/null | tr -d '"')
+        linked_vision=$(/usr/local/bin/yq ".journeys[$i].linked_vision | @json" "$file" 2>/dev/null | tr -d '"')
 
         if [[ -n "$id" && "$id" != "null" && "$id" != *"UJ-04-00"* ]]; then
             # Add node
-            yq -i ".nodes.user_journeys.\"$id\".title = \"$title\"" "$TEMP_DIR/rtm_base.yaml"
+            /usr/local/bin/yq -i ".nodes.user_journeys.\"$id\".title = \"$title\"" "$TEMP_DIR/rtm_base.yaml"
 
             # Add downstream edges (UJ -> FRs)
             if [[ "$linked_frs" != "[]" && "$linked_frs" != "null" ]]; then
-                yq -i ".edges.downstream.\"$id\" = $linked_frs" "$TEMP_DIR/rtm_base.yaml"
+                /usr/local/bin/yq -i ".edges.downstream.\"$id\" = $linked_frs" "$TEMP_DIR/rtm_base.yaml"
             fi
 
             # Add upstream edges (UJ <- Vision)
             if [[ "$linked_vision" != "[]" && "$linked_vision" != "null" ]]; then
-                yq -i ".edges.upstream.\"$id\" = $linked_vision" "$TEMP_DIR/rtm_base.yaml"
+                /usr/local/bin/yq -i ".edges.upstream.\"$id\" = $linked_vision" "$TEMP_DIR/rtm_base.yaml"
             fi
         fi
     done
@@ -142,27 +142,27 @@ extract_functional_requirements() {
     echo "Extracting Functional Requirements from $file..."
 
     local fr_count
-    fr_count=$(yq '.functional_requirements | length' "$file" 2>/dev/null || echo "0")
+    fr_count=$(/usr/local/bin/yq '.functional_requirements | length' "$file" 2>/dev/null || echo "0")
 
     for ((i=0; i<fr_count; i++)); do
         local id title source_journeys linked_invariants linked_processes linked_documents priority
 
-        id=$(yq ".functional_requirements[$i].id" "$file" 2>/dev/null | tr -d '"')
-        title=$(yq ".functional_requirements[$i].title" "$file" 2>/dev/null | tr -d '"')
-        source_journeys=$(yq ".functional_requirements[$i].source_journeys | @json" "$file" 2>/dev/null)
-        linked_invariants=$(yq ".functional_requirements[$i].linked_invariants | @json" "$file" 2>/dev/null)
-        linked_processes=$(yq ".functional_requirements[$i].linked_processes | @json" "$file" 2>/dev/null)
-        linked_documents=$(yq ".functional_requirements[$i].linked_documents | @json" "$file" 2>/dev/null)
-        priority=$(yq ".functional_requirements[$i].priority" "$file" 2>/dev/null | tr -d '"')
+        id=$(/usr/local/bin/yq ".functional_requirements[$i].id" "$file" 2>/dev/null | tr -d '"')
+        title=$(/usr/local/bin/yq ".functional_requirements[$i].title" "$file" 2>/dev/null | tr -d '"')
+        source_journeys=$(/usr/local/bin/yq ".functional_requirements[$i].source_journeys | @json" "$file" 2>/dev/null)
+        linked_invariants=$(/usr/local/bin/yq ".functional_requirements[$i].linked_invariants | @json" "$file" 2>/dev/null)
+        linked_processes=$(/usr/local/bin/yq ".functional_requirements[$i].linked_processes | @json" "$file" 2>/dev/null)
+        linked_documents=$(/usr/local/bin/yq ".functional_requirements[$i].linked_documents | @json" "$file" 2>/dev/null)
+        priority=$(/usr/local/bin/yq ".functional_requirements[$i].priority" "$file" 2>/dev/null | tr -d '"')
 
         if [[ -n "$id" && "$id" != "null" && "$id" != *"FR-00"* ]]; then
             # Add node
-            yq -i ".nodes.functional_requirements.\"$id\".title = \"$title\"" "$TEMP_DIR/rtm_base.yaml"
-            yq -i ".nodes.functional_requirements.\"$id\".priority = \"$priority\"" "$TEMP_DIR/rtm_base.yaml"
+            /usr/local/bin/yq -i ".nodes.functional_requirements.\"$id\".title = \"$title\"" "$TEMP_DIR/rtm_base.yaml"
+            /usr/local/bin/yq -i ".nodes.functional_requirements.\"$id\".priority = \"$priority\"" "$TEMP_DIR/rtm_base.yaml"
 
             # Upstream edges (FR <- Journeys)
             if [[ "$source_journeys" != "[]" && "$source_journeys" != "null" ]]; then
-                yq -i ".edges.upstream.\"$id\" = $source_journeys" "$TEMP_DIR/rtm_base.yaml"
+                /usr/local/bin/yq -i ".edges.upstream.\"$id\" = $source_journeys" "$TEMP_DIR/rtm_base.yaml"
             fi
 
             # Downstream edges (FR -> Invariants, Processes, Documents)
@@ -194,7 +194,7 @@ extract_functional_requirements() {
             downstream+="]"
 
             if [[ "$downstream" != "[]" ]]; then
-                yq -i ".edges.downstream.\"$id\" = $downstream" "$TEMP_DIR/rtm_base.yaml"
+                /usr/local/bin/yq -i ".edges.downstream.\"$id\" = $downstream" "$TEMP_DIR/rtm_base.yaml"
             fi
         fi
     done
@@ -215,22 +215,22 @@ extract_processes() {
     echo "Extracting Processes from $file..."
 
     local process_count
-    process_count=$(yq '.processes | length' "$file" 2>/dev/null || echo "0")
+    process_count=$(/usr/local/bin/yq '.processes | length' "$file" 2>/dev/null || echo "0")
 
     for ((i=0; i<process_count; i++)); do
         local id title linked_frs linked_journeys linked_documents type
 
-        id=$(yq ".processes[$i].id" "$file" 2>/dev/null | tr -d '"')
-        title=$(yq ".processes[$i].title" "$file" 2>/dev/null | tr -d '"')
-        linked_frs=$(yq ".processes[$i].linked_frs | @json" "$file" 2>/dev/null)
-        linked_journeys=$(yq ".processes[$i].linked_journeys | @json" "$file" 2>/dev/null)
-        linked_documents=$(yq ".processes[$i].linked_documents | @json" "$file" 2>/dev/null)
-        type=$(yq ".processes[$i].type" "$file" 2>/dev/null | tr -d '"')
+        id=$(/usr/local/bin/yq ".processes[$i].id" "$file" 2>/dev/null | tr -d '"')
+        title=$(/usr/local/bin/yq ".processes[$i].title" "$file" 2>/dev/null | tr -d '"')
+        linked_frs=$(/usr/local/bin/yq ".processes[$i].linked_frs | @json" "$file" 2>/dev/null)
+        linked_journeys=$(/usr/local/bin/yq ".processes[$i].linked_journeys | @json" "$file" 2>/dev/null)
+        linked_documents=$(/usr/local/bin/yq ".processes[$i].linked_documents | @json" "$file" 2>/dev/null)
+        type=$(/usr/local/bin/yq ".processes[$i].type" "$file" 2>/dev/null | tr -d '"')
 
         if [[ -n "$id" && "$id" != "null" && "$id" != *"{bc_id}"* ]]; then
             # Add node
-            yq -i ".nodes.processes.\"$id\".title = \"$title\"" "$TEMP_DIR/rtm_base.yaml"
-            yq -i ".nodes.processes.\"$id\".type = \"$type\"" "$TEMP_DIR/rtm_base.yaml"
+            /usr/local/bin/yq -i ".nodes.processes.\"$id\".title = \"$title\"" "$TEMP_DIR/rtm_base.yaml"
+            /usr/local/bin/yq -i ".nodes.processes.\"$id\".type = \"$type\"" "$TEMP_DIR/rtm_base.yaml"
 
             # Upstream edges (Process <- FRs + Journeys)
             local upstream="["
@@ -252,12 +252,12 @@ extract_processes() {
             upstream+="]"
 
             if [[ "$upstream" != "[]" ]]; then
-                yq -i ".edges.upstream.\"$id\" = $upstream" "$TEMP_DIR/rtm_base.yaml"
+                /usr/local/bin/yq -i ".edges.upstream.\"$id\" = $upstream" "$TEMP_DIR/rtm_base.yaml"
             fi
 
             # Downstream edges (Process -> Documents)
             if [[ "$linked_documents" != "[]" && "$linked_documents" != "null" ]]; then
-                yq -i ".edges.downstream.\"$id\" = $linked_documents" "$TEMP_DIR/rtm_base.yaml"
+                /usr/local/bin/yq -i ".edges.downstream.\"$id\" = $linked_documents" "$TEMP_DIR/rtm_base.yaml"
             fi
         fi
     done
@@ -279,22 +279,22 @@ extract_documents_and_invariants() {
 
     # Documents
     local doc_count
-    doc_count=$(yq '.documents | length' "$file" 2>/dev/null || echo "0")
+    doc_count=$(/usr/local/bin/yq '.documents | length' "$file" 2>/dev/null || echo "0")
 
     for ((i=0; i<doc_count; i++)); do
         local id negocio linked_frs linked_journeys linked_processes type
 
-        id=$(yq ".documents[$i].id" "$file" 2>/dev/null | tr -d '"')
-        negocio=$(yq ".documents[$i].negocio" "$file" 2>/dev/null | tr -d '"')
-        linked_frs=$(yq ".documents[$i].linked_frs | @json" "$file" 2>/dev/null)
-        linked_journeys=$(yq ".documents[$i].linked_journeys | @json" "$file" 2>/dev/null)
-        linked_processes=$(yq ".documents[$i].linked_processes | @json" "$file" 2>/dev/null)
-        type=$(yq ".documents[$i].type" "$file" 2>/dev/null | tr -d '"')
+        id=$(/usr/local/bin/yq ".documents[$i].id" "$file" 2>/dev/null | tr -d '"')
+        negocio=$(/usr/local/bin/yq ".documents[$i].negocio" "$file" 2>/dev/null | tr -d '"')
+        linked_frs=$(/usr/local/bin/yq ".documents[$i].linked_frs | @json" "$file" 2>/dev/null)
+        linked_journeys=$(/usr/local/bin/yq ".documents[$i].linked_journeys | @json" "$file" 2>/dev/null)
+        linked_processes=$(/usr/local/bin/yq ".documents[$i].linked_processes | @json" "$file" 2>/dev/null)
+        type=$(/usr/local/bin/yq ".documents[$i].type" "$file" 2>/dev/null | tr -d '"')
 
         if [[ -n "$id" && "$id" != "null" && "$id" != *"{bc_id}"* && "$id" != *"{TechnicalName}"* ]]; then
             # Add node
-            yq -i ".nodes.documents.\"$id\".negocio = \"$negocio\"" "$TEMP_DIR/rtm_base.yaml"
-            yq -i ".nodes.documents.\"$id\".type = \"$type\"" "$TEMP_DIR/rtm_base.yaml"
+            /usr/local/bin/yq -i ".nodes.documents.\"$id\".negocio = \"$negocio\"" "$TEMP_DIR/rtm_base.yaml"
+            /usr/local/bin/yq -i ".nodes.documents.\"$id\".type = \"$type\"" "$TEMP_DIR/rtm_base.yaml"
 
             # Upstream edges (Document <- FRs + Journeys + Processes)
             local upstream="["
@@ -325,37 +325,37 @@ extract_documents_and_invariants() {
             upstream+="]"
 
             if [[ "$upstream" != "[]" ]]; then
-                yq -i ".edges.upstream.\"$id\" = $upstream" "$TEMP_DIR/rtm_base.yaml"
+                /usr/local/bin/yq -i ".edges.upstream.\"$id\" = $upstream" "$TEMP_DIR/rtm_base.yaml"
             fi
         fi
     done
 
     # Invariants
     local inv_count
-    inv_count=$(yq '.invariants | length' "$file" 2>/dev/null || echo "0")
+    inv_count=$(/usr/local/bin/yq '.invariants | length' "$file" 2>/dev/null || echo "0")
 
     for ((i=0; i<inv_count; i++)); do
         local id description severity linked_documents linked_frs
 
-        id=$(yq ".invariants[$i].id" "$file" 2>/dev/null | tr -d '"')
-        description=$(yq ".invariants[$i].description" "$file" 2>/dev/null | tr -d '"')
-        severity=$(yq ".invariants[$i].severity" "$file" 2>/dev/null | tr -d '"')
-        linked_documents=$(yq ".invariants[$i].linked_documents | @json" "$file" 2>/dev/null)
-        linked_frs=$(yq ".invariants[$i].linked_frs | @json" "$file" 2>/dev/null)
+        id=$(/usr/local/bin/yq ".invariants[$i].id" "$file" 2>/dev/null | tr -d '"')
+        description=$(/usr/local/bin/yq ".invariants[$i].description" "$file" 2>/dev/null | tr -d '"')
+        severity=$(/usr/local/bin/yq ".invariants[$i].severity" "$file" 2>/dev/null | tr -d '"')
+        linked_documents=$(/usr/local/bin/yq ".invariants[$i].linked_documents | @json" "$file" 2>/dev/null)
+        linked_frs=$(/usr/local/bin/yq ".invariants[$i].linked_frs | @json" "$file" 2>/dev/null)
 
         if [[ -n "$id" && "$id" != "null" ]]; then
             # Add node
-            yq -i ".nodes.invariants.\"$id\".description = \"$description\"" "$TEMP_DIR/rtm_base.yaml"
-            yq -i ".nodes.invariants.\"$id\".severity = \"$severity\"" "$TEMP_DIR/rtm_base.yaml"
+            /usr/local/bin/yq -i ".nodes.invariants.\"$id\".description = \"$description\"" "$TEMP_DIR/rtm_base.yaml"
+            /usr/local/bin/yq -i ".nodes.invariants.\"$id\".severity = \"$severity\"" "$TEMP_DIR/rtm_base.yaml"
 
             # Upstream edges (Invariant <- FRs)
             if [[ "$linked_frs" != "[]" && "$linked_frs" != "null" ]]; then
-                yq -i ".edges.upstream.\"$id\" = $linked_frs" "$TEMP_DIR/rtm_base.yaml"
+                /usr/local/bin/yq -i ".edges.upstream.\"$id\" = $linked_frs" "$TEMP_DIR/rtm_base.yaml"
             fi
 
             # Downstream edges (Invariant -> Documents)
             if [[ "$linked_documents" != "[]" && "$linked_documents" != "null" ]]; then
-                yq -i ".edges.downstream.\"$id\" = $linked_documents" "$TEMP_DIR/rtm_base.yaml"
+                /usr/local/bin/yq -i ".edges.downstream.\"$id\" = $linked_documents" "$TEMP_DIR/rtm_base.yaml"
             fi
         fi
     done
@@ -372,32 +372,32 @@ calculate_statistics() {
     # Count nodes
     local vision_count journeys_count frs_count processes_count docs_count invs_count
 
-    vision_count=$(yq '.nodes.vision_items | length' "$TEMP_DIR/rtm_base.yaml" 2>/dev/null || echo "0")
-    journeys_count=$(yq '.nodes.user_journeys | length' "$TEMP_DIR/rtm_base.yaml" 2>/dev/null || echo "0")
-    frs_count=$(yq '.nodes.functional_requirements | length' "$TEMP_DIR/rtm_base.yaml" 2>/dev/null || echo "0")
-    processes_count=$(yq '.nodes.processes | length' "$TEMP_DIR/rtm_base.yaml" 2>/dev/null || echo "0")
-    docs_count=$(yq '.nodes.documents | length' "$TEMP_DIR/rtm_base.yaml" 2>/dev/null || echo "0")
-    invs_count=$(yq '.nodes.invariants | length' "$TEMP_DIR/rtm_base.yaml" 2>/dev/null || echo "0")
+    vision_count=$(/usr/local/bin/yq '.nodes.vision_items | length' "$TEMP_DIR/rtm_base.yaml" 2>/dev/null || echo "0")
+    journeys_count=$(/usr/local/bin/yq '.nodes.user_journeys | length' "$TEMP_DIR/rtm_base.yaml" 2>/dev/null || echo "0")
+    frs_count=$(/usr/local/bin/yq '.nodes.functional_requirements | length' "$TEMP_DIR/rtm_base.yaml" 2>/dev/null || echo "0")
+    processes_count=$(/usr/local/bin/yq '.nodes.processes | length' "$TEMP_DIR/rtm_base.yaml" 2>/dev/null || echo "0")
+    docs_count=$(/usr/local/bin/yq '.nodes.documents | length' "$TEMP_DIR/rtm_base.yaml" 2>/dev/null || echo "0")
+    invs_count=$(/usr/local/bin/yq '.nodes.invariants | length' "$TEMP_DIR/rtm_base.yaml" 2>/dev/null || echo "0")
 
     total_nodes=$((vision_count + journeys_count + frs_count + processes_count + docs_count + invs_count))
 
     # Count edges
     local upstream_count downstream_count
 
-    upstream_count=$(yq '.edges.upstream | length' "$TEMP_DIR/rtm_base.yaml" 2>/dev/null || echo "0")
-    downstream_count=$(yq '.edges.downstream | length' "$TEMP_DIR/rtm_base.yaml" 2>/dev/null || echo "0")
+    upstream_count=$(/usr/local/bin/yq '.edges.upstream | length' "$TEMP_DIR/rtm_base.yaml" 2>/dev/null || echo "0")
+    downstream_count=$(/usr/local/bin/yq '.edges.downstream | length' "$TEMP_DIR/rtm_base.yaml" 2>/dev/null || echo "0")
 
     total_edges=$((upstream_count + downstream_count))
 
     # Add statistics to RTM
-    yq -i ".metadata.statistics.total_nodes = $total_nodes" "$TEMP_DIR/rtm_base.yaml"
-    yq -i ".metadata.statistics.total_edges = $total_edges" "$TEMP_DIR/rtm_base.yaml"
-    yq -i ".metadata.statistics.nodes_by_type.vision_items = $vision_count" "$TEMP_DIR/rtm_base.yaml"
-    yq -i ".metadata.statistics.nodes_by_type.user_journeys = $journeys_count" "$TEMP_DIR/rtm_base.yaml"
-    yq -i ".metadata.statistics.nodes_by_type.functional_requirements = $frs_count" "$TEMP_DIR/rtm_base.yaml"
-    yq -i ".metadata.statistics.nodes_by_type.processes = $processes_count" "$TEMP_DIR/rtm_base.yaml"
-    yq -i ".metadata.statistics.nodes_by_type.documents = $docs_count" "$TEMP_DIR/rtm_base.yaml"
-    yq -i ".metadata.statistics.nodes_by_type.invariants = $invs_count" "$TEMP_DIR/rtm_base.yaml"
+    /usr/local/bin/yq -i ".metadata.statistics.total_nodes = $total_nodes" "$TEMP_DIR/rtm_base.yaml"
+    /usr/local/bin/yq -i ".metadata.statistics.total_edges = $total_edges" "$TEMP_DIR/rtm_base.yaml"
+    /usr/local/bin/yq -i ".metadata.statistics.nodes_by_type.vision_items = $vision_count" "$TEMP_DIR/rtm_base.yaml"
+    /usr/local/bin/yq -i ".metadata.statistics.nodes_by_type.user_journeys = $journeys_count" "$TEMP_DIR/rtm_base.yaml"
+    /usr/local/bin/yq -i ".metadata.statistics.nodes_by_type.functional_requirements = $frs_count" "$TEMP_DIR/rtm_base.yaml"
+    /usr/local/bin/yq -i ".metadata.statistics.nodes_by_type.processes = $processes_count" "$TEMP_DIR/rtm_base.yaml"
+    /usr/local/bin/yq -i ".metadata.statistics.nodes_by_type.documents = $docs_count" "$TEMP_DIR/rtm_base.yaml"
+    /usr/local/bin/yq -i ".metadata.statistics.nodes_by_type.invariants = $invs_count" "$TEMP_DIR/rtm_base.yaml"
 
     echo "  Total nodes: $total_nodes"
     echo "  Total edges: $total_edges (upstream: $upstream_count, downstream: $downstream_count)"

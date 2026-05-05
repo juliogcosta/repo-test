@@ -12,7 +12,7 @@
 #   0 - Validação passou (todos os IDs válidos e únicos)
 #   1 - Validação falhou (IDs inválidos ou duplicados encontrados)
 #
-# Dependencies: yq (YAML processor)
+# Dependencies: /usr/local/bin/yq (YAML processor)
 
 set -euo pipefail
 
@@ -45,11 +45,11 @@ echo "Project: $PROJECT_ROOT"
 echo "Schema: $ID_SCHEMA"
 echo ""
 
-# Function: Check if yq is installed
+# Function: Check if /usr/local/bin/yq is installed
 check_dependencies() {
-    if ! command -v yq &> /dev/null; then
-        echo -e "${RED}ERROR: yq is not installed${NC}"
-        echo "Install with: sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && sudo chmod +x /usr/local/bin/yq"
+    if ! command -v /usr/local/bin/yq &> /dev/null; then
+        echo -e "${RED}ERROR: /usr/local/bin/yq is not installed${NC}"
+        echo "Install with: sudo wget -qO /usr/local/bin//usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && sudo chmod +x /usr/local/bin/yq"
         exit 1
     fi
 }
@@ -62,13 +62,13 @@ load_id_patterns() {
     fi
 
     # Load patterns
-    ID_PATTERNS[user_journey]=$(yq '.id_patterns.user_journey.pattern' "$ID_SCHEMA" | tr -d '"')
-    ID_PATTERNS[functional_requirement]=$(yq '.id_patterns.functional_requirement.pattern' "$ID_SCHEMA" | tr -d '"')
-    ID_PATTERNS[invariant]=$(yq '.id_patterns.invariant.pattern' "$ID_SCHEMA" | tr -d '"')
-    ID_PATTERNS[success_criteria]=$(yq '.id_patterns.success_criteria.pattern' "$ID_SCHEMA" | tr -d '"')
-    ID_PATTERNS[process]=$(yq '.id_patterns.process.pattern' "$ID_SCHEMA" | tr -d '"')
-    ID_PATTERNS[document]=$(yq '.id_patterns.document.pattern' "$ID_SCHEMA" | tr -d '"')
-    ID_PATTERNS[vision_item]=$(yq '.id_patterns.vision_item.pattern' "$ID_SCHEMA" | tr -d '"')
+    ID_PATTERNS[user_journey]=$(/usr/local/bin/yq '.id_patterns.user_journey.pattern' "$ID_SCHEMA" | tr -d '"')
+    ID_PATTERNS[functional_requirement]=$(/usr/local/bin/yq '.id_patterns.functional_requirement.pattern' "$ID_SCHEMA" | tr -d '"')
+    ID_PATTERNS[invariant]=$(/usr/local/bin/yq '.id_patterns.invariant.pattern' "$ID_SCHEMA" | tr -d '"')
+    ID_PATTERNS[success_criteria]=$(/usr/local/bin/yq '.id_patterns.success_criteria.pattern' "$ID_SCHEMA" | tr -d '"')
+    ID_PATTERNS[process]=$(/usr/local/bin/yq '.id_patterns.process.pattern' "$ID_SCHEMA" | tr -d '"')
+    ID_PATTERNS[document]=$(/usr/local/bin/yq '.id_patterns.document.pattern' "$ID_SCHEMA" | tr -d '"')
+    ID_PATTERNS[vision_item]=$(/usr/local/bin/yq '.id_patterns.vision_item.pattern' "$ID_SCHEMA" | tr -d '"')
 
     echo -e "${GREEN}✓ Loaded ID patterns from schema${NC}"
 }
@@ -145,7 +145,7 @@ register_id() {
 validate_prd_section() {
     local file="$1"
     local section_num
-    section_num=$(yq '.section' "$file" 2>/dev/null || echo "")
+    section_num=$(/usr/local/bin/yq '.section' "$file" 2>/dev/null || echo "")
 
     if [[ -z "$section_num" ]]; then
         return 0  # Skip files without section metadata
@@ -156,11 +156,11 @@ validate_prd_section() {
     # Section 4: User Journeys
     if [[ "$section_num" == "4" ]]; then
         local journey_count
-        journey_count=$(yq '.journeys | length' "$file" 2>/dev/null || echo "0")
+        journey_count=$(/usr/local/bin/yq '.journeys | length' "$file" 2>/dev/null || echo "0")
 
         for ((i=0; i<journey_count; i++)); do
             local id
-            id=$(yq ".journeys[$i].id" "$file" 2>/dev/null | tr -d '"')
+            id=$(/usr/local/bin/yq ".journeys[$i].id" "$file" 2>/dev/null | tr -d '"')
 
             if [[ -n "$id" && "$id" != "null" ]]; then
                 validate_id_format "$id"
@@ -172,11 +172,11 @@ validate_prd_section() {
     # Section 8: Functional Requirements
     if [[ "$section_num" == "8" ]]; then
         local fr_count
-        fr_count=$(yq '.functional_requirements | length' "$file" 2>/dev/null || echo "0")
+        fr_count=$(/usr/local/bin/yq '.functional_requirements | length' "$file" 2>/dev/null || echo "0")
 
         for ((i=0; i<fr_count; i++)); do
             local id
-            id=$(yq ".functional_requirements[$i].id" "$file" 2>/dev/null | tr -d '"')
+            id=$(/usr/local/bin/yq ".functional_requirements[$i].id" "$file" 2>/dev/null | tr -d '"')
 
             if [[ -n "$id" && "$id" != "null" ]]; then
                 validate_id_format "$id"
@@ -190,7 +190,7 @@ validate_prd_section() {
 validate_anexo() {
     local file="$1"
     local anexo_type
-    anexo_type=$(yq '.anexo_type' "$file" 2>/dev/null || echo "")
+    anexo_type=$(/usr/local/bin/yq '.anexo_type' "$file" 2>/dev/null || echo "")
 
     if [[ -z "$anexo_type" ]]; then
         return 0  # Skip files without anexo_type
@@ -201,11 +201,11 @@ validate_anexo() {
     # ANEXO A: Process Details
     if [[ "$anexo_type" == "process_details" ]]; then
         local process_count
-        process_count=$(yq '.processes | length' "$file" 2>/dev/null || echo "0")
+        process_count=$(/usr/local/bin/yq '.processes | length' "$file" 2>/dev/null || echo "0")
 
         for ((i=0; i<process_count; i++)); do
             local id
-            id=$(yq ".processes[$i].id" "$file" 2>/dev/null | tr -d '"')
+            id=$(/usr/local/bin/yq ".processes[$i].id" "$file" 2>/dev/null | tr -d '"')
 
             if [[ -n "$id" && "$id" != "null" && "$id" != *"{bc_id}"* ]]; then
                 validate_id_format "$id"
@@ -213,7 +213,7 @@ validate_anexo() {
 
                 # Validate bc_id follows naming convention (^[a-z]+$)
                 local bc_id
-                bc_id=$(yq ".processes[$i].bounded_context" "$file" 2>/dev/null | tr -d '"')
+                bc_id=$(/usr/local/bin/yq ".processes[$i].bounded_context" "$file" 2>/dev/null | tr -d '"')
                 if [[ -n "$bc_id" && "$bc_id" != "null" && "$bc_id" != *"{bc_id}"* ]]; then
                     if ! echo "$bc_id" | grep -Eq '^[a-z]+$'; then
                         ERRORS+=("Naming violation: process $id has invalid bc_id '$bc_id' (must be ^[a-z]+$)")
@@ -228,11 +228,11 @@ validate_anexo() {
     if [[ "$anexo_type" == "data_models" ]]; then
         # Validate documents
         local doc_count
-        doc_count=$(yq '.documents | length' "$file" 2>/dev/null || echo "0")
+        doc_count=$(/usr/local/bin/yq '.documents | length' "$file" 2>/dev/null || echo "0")
 
         for ((i=0; i<doc_count; i++)); do
             local id
-            id=$(yq ".documents[$i].id" "$file" 2>/dev/null | tr -d '"')
+            id=$(/usr/local/bin/yq ".documents[$i].id" "$file" 2>/dev/null | tr -d '"')
 
             if [[ -n "$id" && "$id" != "null" && "$id" != *"{bc_id}"* && "$id" != *"{TechnicalName}"* ]]; then
                 validate_id_format "$id"
@@ -240,7 +240,7 @@ validate_anexo() {
 
                 # Validate bc_id follows naming convention (^[a-z]+$)
                 local bc_id
-                bc_id=$(yq ".documents[$i].bounded_context" "$file" 2>/dev/null | tr -d '"')
+                bc_id=$(/usr/local/bin/yq ".documents[$i].bounded_context" "$file" 2>/dev/null | tr -d '"')
                 if [[ -n "$bc_id" && "$bc_id" != "null" && "$bc_id" != *"{bc_id}"* ]]; then
                     if ! echo "$bc_id" | grep -Eq '^[a-z]+$'; then
                         ERRORS+=("Naming violation: document $id has invalid bc_id '$bc_id' (must be ^[a-z]+$)")
@@ -252,11 +252,11 @@ validate_anexo() {
 
         # Validate invariants
         local inv_count
-        inv_count=$(yq '.invariants | length' "$file" 2>/dev/null || echo "0")
+        inv_count=$(/usr/local/bin/yq '.invariants | length' "$file" 2>/dev/null || echo "0")
 
         for ((i=0; i<inv_count; i++)); do
             local id
-            id=$(yq ".invariants[$i].id" "$file" 2>/dev/null | tr -d '"')
+            id=$(/usr/local/bin/yq ".invariants[$i].id" "$file" 2>/dev/null | tr -d '"')
 
             if [[ -n "$id" && "$id" != "null" ]]; then
                 validate_id_format "$id"
